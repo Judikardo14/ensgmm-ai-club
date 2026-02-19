@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
   loading: true,
@@ -10,10 +10,7 @@ export const useAuthStore = create((set) => ({
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.user) {
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
+        .from('profiles').select('*').eq('id', session.user.id).single()
       set({ user: session.user, profile, loading: false })
     } else {
       set({ loading: false })
@@ -22,10 +19,7 @@ export const useAuthStore = create((set) => ({
     supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+          .from('profiles').select('*').eq('id', session.user.id).single()
         set({ user: session.user, profile })
       } else {
         set({ user: null, profile: null })

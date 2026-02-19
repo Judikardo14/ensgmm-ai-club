@@ -11,18 +11,31 @@ export default function Login() {
   const [error, setError]       = useState('')
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+  e.preventDefault()
+  setLoading(true)
+  setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError('Email ou mot de passe incorrect.')
-      setLoading(false)
-    } else {
-      navigate('/dashboard')
-    }
+  if (error) {
+    setError('Email ou mot de passe incorrect.')
+    setLoading(false)
+    return
+  }
+
+  // Récupérer le profil pour connaître le rôle
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single()
+
+  if (profile?.role === 'admin') {
+    navigate('/admin')
+  } else {
+    navigate('/dashboard')
+  }
+
   }
 
   return (
