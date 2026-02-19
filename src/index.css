@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Unbounded:wght@400;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:          #030507;
+  --bg2:         #060a0f;
+  --surface:     #0a1018;
+  --surface2:    #0f1820;
+  --border:      #1a2535;
+  --border2:     #243347;
+  --accent:      #00FF87;
+  --accent-dim:  #00c468;
+  --blue:        #2C7BE5;
+  --warn:        #FFB830;
+  --danger:      #FF4B6E;
+  --text:        #dce8f5;
+  --text2:       #6b849e;
+  --text3:       #3d5268;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+@keyframes scan {
+  0%   { top: -2px; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
