@@ -271,7 +271,7 @@ export default function Profile() {
         .from('profiles')
         .select('*', { count: 'exact', head: true })
         .gt('total_points', myProfile.total_points || 0),
-    ])
+    ]);
 
     setSubmissions(subs || [])
     setRank((count || 0) + 1)
