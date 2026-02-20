@@ -243,7 +243,7 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
           {/* Tabs nav */}
           <div style={{ display:'flex', gap:4, marginBottom:18, background:'var(--bg2)', borderRadius:8, padding:4 }}>
             {[['info','Infos'], ['leaderboard','Classement'], ...(isParticipant && status === 'active' ? [['submit','Soumettre']] : [])].map(([k,label]) => (
-              <button key={k} onClick={() => setView(k)} style={{
+              <button key={k} onClick={e => { e.stopPropagation(); setView(k) }} style={{
                 flex:1, padding:'6px 0',
                 background: view===k ? 'var(--surface)' : 'none',
                 border: view===k ? '1px solid var(--border)' : '1px solid transparent',
