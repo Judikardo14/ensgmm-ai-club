@@ -76,90 +76,67 @@ function SectionTitle({ children }) {
 // ─── Card submission history ──────────────────────────────────────────────────
 function SubmissionRow({ sub }) {
   const statusMap = {
-    submitted: { label: 'Soumis',  color: '#2C7BE5',  bg: 'rgba(44,123,229,0.1)' },
-    graded:    { label: 'Noté',    color: '#00c468',  bg: 'rgba(0,255,135,0.08)' },
+    submitted: { label: 'Soumis',    color: '#2C7BE5', bg: 'rgba(44,123,229,0.1)' },
+    graded:    { label: 'Noté',      color: '#00c468', bg: 'rgba(0,255,135,0.08)' },
     late:      { label: 'En retard', color: '#FFB830', bg: 'rgba(255,184,48,0.1)' },
   }
   const s = statusMap[sub.status] || statusMap.submitted
 
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 12,
-      padding: '11px 14px',
       background: 'var(--bg2)', border: '1px solid var(--border)',
-      borderRadius: 8, transition: 'border-color 0.2s',
+      borderRadius: 8, padding: '12px 14px',
+      transition: 'border-color 0.2s',
     }}
     onMouseEnter={e => e.currentTarget.style.borderColor = '#243347'}
     onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
     >
-      <div style={{
-        width: 32, height: 32, borderRadius: 7, flexShrink: 0,
-        background: 'rgba(44,123,229,0.1)', color: '#2C7BE5',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <div style={{ width: 14, height: 14 }}><Icon.File /></div>
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 11, color: 'var(--text)', letterSpacing: '0.02em',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 3,
-        }}>
+      {/* Ligne 1 : titre + statut */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+        <div style={{ fontSize: 11, color: 'var(--text)', letterSpacing: '0.02em', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {sub.assignments?.title || 'Devoir'}
         </div>
-        <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 9, height: 9 }}><Icon.Clock /></div>
-          {sub.submitted_at ? formatDeadline(sub.submitted_at) : '—'}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        {sub.score != null && (
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#00c468', letterSpacing: '0.02em' }}>
-            {sub.score}<span style={{ fontSize: 9, color: 'var(--text3)', marginLeft: 2 }}>pts</span>
-          </div>
-        )}
-        
-        {/* Note de l'étudiant */}
-        {sub.notes && (
-          <div style={{
-            marginTop: 8, padding: '8px 12px',
-            background: 'rgba(44,123,229,0.05)',
-            border: '1px solid rgba(44,123,229,0.15)',
-            borderRadius: 6, fontSize: 10,
-            color: '#2C7BE5', lineHeight: 1.6,
-          }}>
-            <span style={{ color: '#3d5268', marginRight: 6 }}>Ta note :</span>
-            {sub.notes}
-          </div>
-        )}
-        
-        {/* Feedback de l'admin */}
-        {sub.feedback && (
-          <div style={{
-            marginTop: 6, padding: '8px 12px',
-            background: 'rgba(0,255,135,0.05)',
-            border: '1px solid rgba(0,255,135,0.15)',
-            borderRadius: 6, fontSize: 10,
-            color: '#00c468', lineHeight: 1.6,
-          }}>
-            <span style={{ color: '#3d5268', marginRight: 6 }}>Feedback :</span>
-            {sub.feedback}
-          </div>
-        )}
-        <span style={{
-          fontSize: 9, padding: '2px 8px', borderRadius: 4,
-          background: s.bg, color: s.color, letterSpacing: '0.06em',
-        }}>
+        <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 4, background: s.bg, color: s.color, letterSpacing: '0.06em', flexShrink: 0 }}>
           {s.label}
         </span>
+      </div>
+
+      {/* Ligne 2 : date + score + lien */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: sub.notes || sub.feedback ? 8 : 0 }}>
+        <span style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 9, height: 9 }}><Icon.Clock /></div>
+          {sub.submitted_at ? formatDeadline(sub.submitted_at) : '—'}
+        </span>
+        {sub.score != null && (
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#00c468' }}>
+            {sub.score} <span style={{ fontSize: 9, color: 'var(--text3)' }}>pts</span>
+          </span>
+        )}
         {sub.file_url && (
-          <a href={sub.file_url} target="_blank" rel="noreferrer" style={{ color: 'var(--text3)', display: 'flex' }}
+          <a href={sub.file_url} target="_blank" rel="noreferrer"
+            style={{ color: 'var(--text3)', display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, textDecoration: 'none' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ width: 12, height: 12 }}><Icon.Link /></div>
+            <div style={{ width: 10, height: 10 }}><Icon.Link /></div>
+            Fichier
           </a>
         )}
       </div>
+
+      {/* Note de l'étudiant */}
+      {sub.notes && (
+        <div style={{ marginTop: 6, padding: '7px 10px', background: 'rgba(44,123,229,0.06)', border: '1px solid rgba(44,123,229,0.15)', borderRadius: 6, fontSize: 10, color: '#2C7BE5', lineHeight: 1.6 }}>
+          <span style={{ color: 'var(--text3)', marginRight: 6 }}>Ta note :</span>
+          {sub.notes}
+        </div>
+      )}
+
+      {/* Feedback admin */}
+      {sub.feedback && (
+        <div style={{ marginTop: 6, padding: '7px 10px', background: 'rgba(0,255,135,0.05)', border: '1px solid rgba(0,255,135,0.15)', borderRadius: 6, fontSize: 10, color: '#00c468', lineHeight: 1.6 }}>
+          <span style={{ color: 'var(--text3)', marginRight: 6 }}>Feedback :</span>
+          {sub.feedback}
+        </div>
+      )}
     </div>
   )
 }
