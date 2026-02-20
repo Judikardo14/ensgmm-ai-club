@@ -637,7 +637,7 @@ export default function Dashboard() {
                 </div></Card>
               : <div style={{
                   background:'#0a1018', border:'1px solid #1a2535', borderRadius:10,
-                  overflow:'hidden',
+                  overflow:'visible',
                 }}>
                   {/* Top 5 avec scroll interne */}
                   <div style={{
