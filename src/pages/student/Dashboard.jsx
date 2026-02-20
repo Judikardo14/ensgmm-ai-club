@@ -391,6 +391,7 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
 // ══════════════════════════════════
 export default function Dashboard() {
   const { profile } = useAuthStore()
+  const [myRank, setMyRank] = useState(null)
   const [assignments, setAssignments]   = useState([])
   const [submissions, setSubmissions]   = useState([])
   const [leaders, setLeaders]           = useState([])
@@ -434,11 +435,17 @@ export default function Dashboard() {
   }
 
   const fetchLeaders = async () => {
-    const { data } = await supabase.from('profiles')
+  const [{ data }, { count }] = await Promise.all([
+    supabase.from('profiles')
       .select('id, full_name, total_points')
-      .order('total_points', { ascending: false }).limit(8)
-    setLeaders(data || [])
-  }
+      .order('total_points', { ascending: false }).limit(8),
+    supabase.from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gt('total_points', profile?.total_points || 0),
+  ])
+  setLeaders(data || [])
+  setMyRank((count || 0) + 1)
+}
 
   const fetchActivities = async () => {
     const { data } = await supabase.from('activities')
@@ -462,8 +469,6 @@ export default function Dashboard() {
   }, [])
 
   // Calculs dérivés
-  const myIdx    = leaders.findIndex(l => l.id === profile?.id)
-  const myRank   = myIdx >= 0 ? myIdx + 1 : null
   const myPoints = profile?.total_points || 0
   const maxPts   = leaders[0]?.total_points || 1
   const pending  = assignments.filter(a => !a.submitted && urgencyOf(a.deadline, false) !== 'expired').length
