@@ -96,7 +96,8 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
       .order('score', { ascending: false })
       .limit(10)
     setLeaderboard(data || [])
-    console.log('leaderboard data:', data) 
+    console.log('leaderboard data:', data)
+    console.log('view actuel:', view)
   }, [comp.id])
   
   useEffect(() => {
