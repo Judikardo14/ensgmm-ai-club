@@ -85,16 +85,31 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
   const [leaderboard, setLeaderboard] = useState([])
   const [view, setView] = useState('info') // 'info' | 'submit' | 'leaderboard'
 
-  useEffect(() => {
-    supabase
+ 
+
+  const fetchLeaderboard = useCallback(async () => {
+  const { data } = await supabase
       .from('competition_entries')
-      .select('score, profiles(full_name, avatar_url)')
+      .select('user_id, score, profiles(full_name, avatar_url)')
       .eq('competition_id', comp.id)
       .not('score', 'is', null)
       .order('score', { ascending: false })
       .limit(10)
-      .then(({ data }) => setLeaderboard(data || []))
+    setLeaderboard(data || [])
   }, [comp.id])
+  
+  useEffect(() => {
+    fetchLeaderboard()
+  const channel = supabase.channel(`lb-${comp.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'competition_entries',
+        filter: `competition_id=eq.${comp.id}`,
+      }, fetchLeaderboard)
+      .subscribe()
+    return () => supabase.removeChannel(channel)
+  }, [fetchLeaderboard])
 
   const handleJoin = async () => {
     setLoading(true); setError('')
