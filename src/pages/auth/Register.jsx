@@ -208,18 +208,33 @@ export default function Register() {
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>PRÉNOM *</label>
-                  <input style={styles.input} placeholder="Judikardo" value={form.firstName}
+                  <input
+                    style={styles.input}
+                    placeholder="Judikardo"
+                    value={form.firstName}
+                    autoCorrect="off"
+                    autoCapitalize="words"
+                    spellCheck="false"
                     onChange={e => set('firstName', e.target.value)}
                     onFocus={e => e.target.style.borderColor = '#00c468'}
-                    onBlur={e => e.target.style.borderColor = '#1a2535'} />
+                    onBlur={e => e.target.style.borderColor = '#1a2535'}
+                  />
                 </div>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>NOM *</label>
-                  <input style={styles.input} placeholder="Epsilon" value={form.lastName}
+                  <input
+                    style={styles.input}
+                    placeholder="Epsilon"
+                    value={form.lastName}
+                    autoCorrect="off"
+                    autoCapitalize="words"
+                    spellCheck="false"
                     onChange={e => set('lastName', e.target.value)}
                     onFocus={e => e.target.style.borderColor = '#00c468'}
-                    onBlur={e => e.target.style.borderColor = '#1a2535'} />
+                    onBlur={e => e.target.style.borderColor = '#1a2535'}
+                  />
                 </div>
+              </div>
               </div>
 
               <div style={styles.formGroup}>
