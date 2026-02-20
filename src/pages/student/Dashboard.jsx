@@ -206,6 +206,186 @@ function ActivityItem({ color, title, desc, time, isLast }) {
   )
 }
 
+// ── Modal Soumission ──
+function SubmitModal({ competition, profile, onClose, onSuccess }) {
+  const [file, setFile]       = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState('')
+  const [success, setSuccess] = useState(false)
+
+  const handleSubmit = async () => {
+    setError('')
+    if (!file) return setError('Sélectionne un fichier.')
+    if (!file.name.toLowerCase().endsWith('.csv'))
+      return setError('Seuls les fichiers CSV sont acceptés.')
+
+    setLoading(true)
+    const path = `submissions/${competition.id}/${profile.id}_${Date.now()}.csv`
+
+    const { error: upErr } = await supabase.storage
+      .from('submissions')
+      .upload(path, file, { upsert: true })
+
+    if (upErr) {
+      setError('Erreur upload : ' + upErr.message)
+      setLoading(false)
+      return
+    }
+
+    const { data: urlData } = supabase.storage.from('submissions').getPublicUrl(path)
+
+    const { error: dbErr } = await supabase.from('submissions').upsert({
+      user_id:        profile.id,
+      competition_id: competition.id,
+      file_url:       urlData.publicUrl,
+      status:         'submitted',
+      submitted_at:   new Date().toISOString(),
+    })
+
+    if (dbErr) {
+      setError('Erreur sauvegarde : ' + dbErr.message)
+      setLoading(false)
+      return
+    }
+
+    setSuccess(true)
+    setLoading(false)
+    setTimeout(() => { onSuccess(); onClose() }, 2000)
+  }
+
+  return (
+    <div style={{
+      position:'fixed', inset:0, zIndex:1000,
+      background:'rgba(3,5,7,0.88)', backdropFilter:'blur(8px)',
+      display:'flex', alignItems:'center', justifyContent:'center', padding:20,
+    }} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{
+        background:'#0a1018', border:'1px solid #1a2535', borderRadius:14,
+        width:'100%', maxWidth:420, padding:'28px 28px 24px',
+        boxShadow:'0 24px 64px rgba(0,0,0,0.7)',
+        position:'relative', overflow:'hidden',
+      }}>
+        {/* top accent */}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:1,
+          background:'linear-gradient(90deg,transparent,rgba(0,255,135,0.3),transparent)' }}/>
+
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
+          <div>
+            <div style={{ fontSize:9, color:'#3d5268', letterSpacing:'0.15em',
+              textTransform:'uppercase', marginBottom:4 }}>SOUMISSION</div>
+            <div style={{ fontSize:14, color:'#dce8f5' }}>{competition.title}</div>
+          </div>
+          <button onClick={onClose} style={{
+            background:'none', border:'1px solid #1a2535', borderRadius:6,
+            width:28, height:28, cursor:'pointer', color:'#3d5268',
+            display:'flex', alignItems:'center', justifyContent:'center', fontSize:16,
+          }}>✕</button>
+        </div>
+
+        {success ? (
+          <div style={{ textAlign:'center', padding:'28px 0' }}>
+            <div style={{ fontSize:32, marginBottom:12 }}>✓</div>
+            <div style={{ fontSize:12, color:'#00FF87', letterSpacing:'0.04em' }}>
+              Soumission envoyée avec succès !
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Format info */}
+            <div style={{
+              display:'flex', alignItems:'center', gap:8, padding:'8px 12px',
+              background:'rgba(0,255,135,0.05)', border:'1px solid rgba(0,255,135,0.15)',
+              borderRadius:8, marginBottom:16,
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c468" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span style={{ fontSize:10, color:'#6b849e', letterSpacing:'0.04em' }}>
+                Format accepté : <span style={{ color:'#00FF87' }}>CSV uniquement</span>
+              </span>
+            </div>
+
+            {/* Zone drop */}
+            <label style={{
+              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+              gap:10, padding:'28px 16px',
+              border:`2px dashed ${file ? '#00c468' : '#1a2535'}`,
+              borderRadius:10, cursor:'pointer', marginBottom:14,
+              background: file ? 'rgba(0,196,104,0.04)' : 'transparent',
+              transition:'all 0.2s',
+            }}
+              onMouseEnter={e => { if (!file) e.currentTarget.style.borderColor = '#243347' }}
+              onMouseLeave={e => { if (!file) e.currentTarget.style.borderColor = '#1a2535' }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke={file ? '#00c468' : '#3d5268'} strokeWidth="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              {file ? (
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:11, color:'#00c468', marginBottom:3 }}>{file.name}</div>
+                  <div style={{ fontSize:9, color:'#3d5268' }}>
+                    {(file.size / 1024).toFixed(1)} KB · Cliquer pour changer
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:11, color:'#6b849e', marginBottom:3 }}>
+                    Cliquer pour choisir un fichier
+                  </div>
+                  <div style={{ fontSize:9, color:'#3d5268' }}>CSV uniquement</div>
+                </div>
+              )}
+              <input type="file" accept=".csv" style={{ display:'none' }}
+                onChange={e => { setFile(e.target.files[0]); setError('') }} />
+            </label>
+
+            {/* Erreur */}
+            {error && (
+              <div style={{
+                fontSize:10, color:'#FF4B6E',
+                background:'rgba(255,75,110,0.08)', border:'1px solid rgba(255,75,110,0.2)',
+                borderRadius:6, padding:'8px 12px', marginBottom:14,
+                display:'flex', alignItems:'center', gap:8,
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            {/* Boutons */}
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={onClose} style={{
+                flex:1, padding:'10px 0', background:'none',
+                border:'1px solid #1a2535', borderRadius:8, cursor:'pointer',
+                color:'#3d5268', fontSize:10, fontFamily:"'IBM Plex Mono',monospace",
+                letterSpacing:'0.08em',
+              }}>
+                ANNULER
+              </button>
+              <button onClick={handleSubmit} disabled={loading} style={{
+                flex:2, padding:'10px 0',
+                background: loading ? '#00c468' : '#00FF87',
+                border:'none', borderRadius:8,
+                cursor: loading ? 'wait' : 'pointer',
+                color:'#030507', fontWeight:700, fontSize:10,
+                fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.1em',
+                opacity: !file ? 0.6 : 1,
+              }}>
+                {loading ? 'ENVOI EN COURS…' : 'CONFIRMER →'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ══════════════════════════════════
 // PAGE DASHBOARD
 // ══════════════════════════════════
@@ -218,6 +398,9 @@ export default function Dashboard() {
   const [competitions, setCompetitions] = useState([])
   const [loading, setLoading]           = useState(true)
   const [isMobile, setIsMobile]         = useState(window.innerWidth < 768)
+
+  // ── Modal soumission ──
+  const [submitTarget, setSubmitTarget] = useState(null) // competition object
 
   useEffect(() => {
     const handle = () => setIsMobile(window.innerWidth < 768)
@@ -505,10 +688,12 @@ export default function Dashboard() {
                               background:'linear-gradient(90deg,#00c468,#00FF87)' }}/>
                           </div>
                         </div>
-                        <button style={{ padding:'7px 14px', background:'#00FF87', color:'#030507',
-                          border:'none', borderRadius:6, cursor:'pointer',
-                          fontFamily:"'IBM Plex Mono',monospace", fontSize:10, fontWeight:600,
-                          letterSpacing:'0.08em', display:'inline-flex', alignItems:'center', gap:6 }}
+                        <button
+                          onClick={() => setSubmitTarget(c)}
+                          style={{ padding:'7px 14px', background:'#00FF87', color:'#030507',
+                            border:'none', borderRadius:6, cursor:'pointer',
+                            fontFamily:"'IBM Plex Mono',monospace", fontSize:10, fontWeight:600,
+                            letterSpacing:'0.08em', display:'inline-flex', alignItems:'center', gap:6 }}
                           onMouseEnter={e => e.currentTarget.style.boxShadow='0 0 16px rgba(0,255,135,0.3)'}
                           onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -525,6 +710,16 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* ── Modal soumission ── */}
+      {submitTarget && (
+        <SubmitModal
+          competition={submitTarget}
+          profile={profile}
+          onClose={() => setSubmitTarget(null)}
+          onSuccess={fetchCompetitions}
+        />
+      )}
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }

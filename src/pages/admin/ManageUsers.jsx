@@ -11,6 +11,8 @@ const Icon = {
   File:    () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
   X:       () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
   Check:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  Trash:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
+  Warning: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
   Medal:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.56 2.9A7 7 0 0 1 19 9v1h-2"/><path d="M6.5 9.5 5 9V4"/></svg>,
   ChevronDown: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
 }
@@ -26,11 +28,16 @@ const AVATAR_GRADS = [
 const avatarGrad = (name = '') => AVATAR_GRADS[name.charCodeAt(0) % AVATAR_GRADS.length]
 
 // ─── Modal détail étudiant ─────────────────────────────────────────────────────
-function UserModal({ profile, rank, onClose, onRoleChanged }) {
+function UserModal({ profile: initialProfile, rank, onClose, onRoleChanged, onDeleted }) {
   const { profile: myProfile } = useAuthStore()
-  const [subs, setSubs]       = useState([])
-  const [loading, setLoading] = useState(true)
-  const [changing, setChanging] = useState(false)
+  const [profile, setProfile]     = useState({ ...initialProfile })
+  const [subs, setSubs]           = useState([])
+  const [loading, setLoading]     = useState(true)
+  const [changing, setChanging]   = useState(false)
+  const [roleError, setRoleError] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting]   = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     supabase
@@ -44,10 +51,51 @@ function UserModal({ profile, rank, onClose, onRoleChanged }) {
   const toggleRole = async () => {
     if (profile.id === myProfile?.id) return
     setChanging(true)
+    setRoleError('')
     const newRole = profile.role === 'admin' ? 'student' : 'admin'
-    await supabase.from('profiles').update({ role: newRole }).eq('id', profile.id)
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', profile.id)
+
     setChanging(false)
-    onRoleChanged()
+
+    if (error) {
+      // Erreur RLS la plus fréquente
+      if (error.code === '42501' || error.message.includes('row-level security')) {
+        setRoleError('Accès refusé par Supabase RLS. Voir instructions ci-dessous.')
+      } else {
+        setRoleError(error.message)
+      }
+      return
+    }
+
+    // Mise à jour locale immédiate → badge change dans la modal
+    setProfile(prev => ({ ...prev, role: newRole }))
+    // Notifier le parent (re-fetch liste + toast)
+    onRoleChanged(profile.id, newRole)
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    setDeleteError('')
+
+    // Supprimer les soumissions d'abord (FK cascade normalement, mais on s'assure)
+    await supabase.from('submissions').delete().eq('user_id', profile.id)
+    await supabase.from('competition_entries').delete().eq('user_id', profile.id)
+
+    // Supprimer le profil (cascade supprime aussi auth.users grâce au ON DELETE CASCADE)
+    const { error } = await supabase.from('profiles').delete().eq('id', profile.id)
+
+    if (error) {
+      setDeleteError(error.message)
+      setDeleting(false)
+      return
+    }
+
+    // Notifier le parent
+    onDeleted(profile.id)
   }
 
   const gradedSubs = subs.filter(s => s.score != null)
@@ -84,19 +132,32 @@ function UserModal({ profile, rank, onClose, onRoleChanged }) {
                 borderRadius: 6, cursor: changing ? 'wait' : 'pointer',
                 color: profile.role === 'admin' ? '#FF4B6E' : '#00c468',
                 fontSize: 9, fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
-                transition: 'all 0.15s',
+                transition: 'all 0.2s', opacity: changing ? 0.6 : 1,
               }}>
                 <div style={{ width: 11, height: 11 }}>{profile.role === 'admin' ? <Icon.User /> : <Icon.Shield />}</div>
-                {changing ? '…' : profile.role === 'admin' ? 'Rétrograder Student' : 'Promouvoir Admin'}
+                {changing ? 'MISE À JOUR…' : profile.role === 'admin' ? 'Rétrograder Student' : 'Promouvoir Admin'}
               </button>
             )}
           </div>
+
+          {/* Erreur RLS */}
+          {roleError && (
+            <div style={{ fontSize: 10, color: '#FF4B6E', background: 'rgba(255,75,110,0.08)', border: '1px solid rgba(255,75,110,0.2)', borderRadius: 8, padding: '10px 12px', marginBottom: 14, lineHeight: 1.7 }}>
+              ⚠ {roleError}
+              {roleError.includes('RLS') && (
+                <div style={{ marginTop: 8, color: '#FFB830', fontSize: 9 }}>
+                  → Supabase Dashboard › Authentication › Policies › profiles<br/>
+                  → Ajouter : UPDATE allowed WHERE role = 'admin'
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 15, color: 'var(--text)', fontWeight: 600, letterSpacing: '0.02em', marginBottom: 4 }}>{profile.full_name}</div>
             <div style={{ fontSize: 10, color: 'var(--text3)', letterSpacing: '0.04em', marginBottom: 4 }}>{profile.email}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: profile.role === 'admin' ? 'rgba(255,75,110,0.1)' : 'rgba(0,255,135,0.08)', color: profile.role === 'admin' ? '#FF4B6E' : '#00c468', border: `1px solid ${profile.role === 'admin' ? 'rgba(255,75,110,0.2)' : 'rgba(0,255,135,0.2)'}`, letterSpacing: '0.1em' }}>
+              <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: profile.role === 'admin' ? 'rgba(255,75,110,0.1)' : 'rgba(0,255,135,0.08)', color: profile.role === 'admin' ? '#FF4B6E' : '#00c468', border: `1px solid ${profile.role === 'admin' ? 'rgba(255,75,110,0.2)' : 'rgba(0,255,135,0.2)'}`, letterSpacing: '0.1em', transition: 'all 0.3s' }}>
                 {profile.role === 'admin' ? 'ADMIN' : 'STUDENT'}
               </span>
               {profile.filiere && <span style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.04em' }}>{profile.filiere}{profile.promo ? ` · ${profile.promo}` : ''}</span>}
@@ -146,6 +207,51 @@ function UserModal({ profile, rank, onClose, onRoleChanged }) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* ── Zone suppression ── */}
+          {profile.id !== myProfile?.id && (
+            <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  style={{ width: '100%', padding: '9px 0', background: 'rgba(255,75,110,0.06)', border: '1px solid rgba(255,75,110,0.15)', borderRadius: 8, cursor: 'pointer', color: '#FF4B6E', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, transition: 'all 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,75,110,0.12)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,75,110,0.06)'}
+                >
+                  <div style={{ width: 13, height: 13 }}><Icon.Trash /></div>
+                  SUPPRIMER CE COMPTE
+                </button>
+              ) : (
+                <div style={{ background: 'rgba(255,75,110,0.06)', border: '1px solid rgba(255,75,110,0.2)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <div style={{ width: 15, height: 15, color: '#FF4B6E', flexShrink: 0 }}><Icon.Warning /></div>
+                    <div style={{ fontSize: 11, color: 'var(--text)', fontWeight: 600 }}>Confirmer la suppression</div>
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text3)', lineHeight: 1.6, marginBottom: 12 }}>
+                    Le compte de <span style={{ color: 'var(--text)' }}>{profile.full_name}</span> sera définitivement supprimé ainsi que toutes ses soumissions. Cette action est irréversible.
+                  </div>
+                  {deleteError && (
+                    <div style={{ fontSize: 10, color: '#FF4B6E', marginBottom: 10, letterSpacing: '0.03em' }}>⚠ {deleteError}</div>
+                  )}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => { setConfirmDelete(false); setDeleteError('') }}
+                      style={{ flex: 1, padding: '8px 0', background: 'none', border: '1px solid var(--border2)', borderRadius: 7, cursor: 'pointer', color: 'var(--text3)', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace" }}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      style={{ flex: 1, padding: '8px 0', background: '#FF4B6E', border: 'none', borderRadius: 7, cursor: deleting ? 'wait' : 'pointer', color: '#fff', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace", fontWeight: 700, letterSpacing: '0.06em', opacity: deleting ? 0.7 : 1 }}
+                    >
+                      {deleting ? 'SUPPRESSION…' : 'CONFIRMER'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -315,7 +421,19 @@ export default function ManageUsers() {
           profile={selected.profile}
           rank={selected.rank}
           onClose={() => setSelected(null)}
-          onRoleChanged={() => { fetchAll(); setSelected(null); showToast('✓ Rôle mis à jour !') }}
+          onRoleChanged={(userId, newRole) => {
+            setProfiles(prev => prev.map(p =>
+              p.id === userId ? { ...p, role: newRole } : p
+            ))
+            showToast(`✓ Rôle mis à jour : ${newRole === 'admin' ? 'Admin ↑' : 'Student ↓'}`)
+            fetchAll()
+          }}
+          onDeleted={(userId) => {
+            setSelected(null)
+            setProfiles(prev => prev.filter(p => p.id !== userId))
+            showToast('✓ Compte supprimé.')
+            fetchAll()
+          }}
         />
       )}
     </div>

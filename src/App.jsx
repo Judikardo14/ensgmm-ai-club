@@ -1,57 +1,60 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
-import Login from './pages/auth/Login'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword  from './pages/auth/ResetPassword'
+
+// Auth
+import Login    from './pages/auth/Login'
 import Register from './pages/auth/Register'
+
+// Layout
 import PageWrapper from './components/layout/PageWrapper'
-import Dashboard from './pages/student/Dashboard'
-import Assignments from './pages/student/Assignments'
+
+// Student pages
+import Dashboard    from './pages/student/Dashboard'
+import Assignments  from './pages/student/Assignments'
 import Competitions from './pages/student/Competitions'
-import Leaderboard from './pages/student/Leaderboard'
-import Profile from './pages/student/Profile'
+import Leaderboard  from './pages/student/Leaderboard'
+import Profile      from './pages/student/Profile'
+
+// Admin pages
 import AdminDashboard    from './pages/admin/AdminDashboard'
 import ManageAssignments from './pages/admin/ManageAssignments'
 import ManageCompetitions from './pages/admin/ManageCompetitions'
 import ManageUsers       from './pages/admin/ManageUsers'
 
-// ── Écran de chargement ──
-const Loading = () => (
-  <div style={{
-    display:'flex', alignItems:'center', justifyContent:'center',
-    height:'100vh', background:'#030507',
-    color:'#3d5268', fontFamily:"'IBM Plex Mono',monospace",
-    fontSize:'11px', letterSpacing:'0.15em',
-  }}>
-    INITIALISATION SYSTÈME...
-  </div>
-)
+// ─── Guard routes ─────────────────────────────────────────────────────────────
 
-// ── Route privée : doit être connecté ──
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuthStore()
-  if (loading) return <Loading />
+  if (loading) return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', color: '#3d5268',
+      fontFamily: "'IBM Plex Mono',monospace",
+      fontSize: 11, letterSpacing: '0.15em', background: '#030507',
+    }}>
+      INITIALISATION SYSTÈME...
+    </div>
+  )
   return user ? children : <Navigate to="/login" replace />
 }
 
-// ── Route publique : redirige si déjà connecté ──
 const PublicRoute = ({ children }) => {
-  const { user, profile, loading } = useAuthStore()
-  if (loading) return <Loading />
-  if (user) {
-    // Rediriger vers la bonne interface selon le rôle
-    return <Navigate to={profile?.role === 'admin' ? '/admin' : '/dashboard'} replace />
-  }
-  return children
+  const { user, loading } = useAuthStore()
+  if (loading) return null
+  return user ? <Navigate to="/dashboard" replace /> : children
 }
 
-// ── Route admin : doit être connecté ET admin ──
+// Seuls les admins peuvent accéder aux routes admin
 const AdminRoute = ({ children }) => {
-  const { user, profile, loading } = useAuthStore()
-  if (loading) return <Loading />
-  if (!user) return <Navigate to="/login" replace />
-  if (profile?.role !== 'admin') return <Navigate to="/dashboard" replace />
-  return children
+  const { profile, loading } = useAuthStore()
+  if (loading) return null
+  return profile?.role === 'admin' ? children : <Navigate to="/dashboard" replace />
 }
+
+// ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const init = useAuthStore(s => s.init)
@@ -61,28 +64,31 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* ── Pages publiques ── */}
+        {/* ── Public ── */}
         <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-
-        {/* ── Pages étudiant ── */}
+        <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+        
+        {/* ── Privé avec layout ── */}
         <Route element={<PrivateRoute><PageWrapper /></PrivateRoute>}>
+
+          {/* Student */}
           <Route path="/dashboard"    element={<Dashboard />} />
           <Route path="/assignments"  element={<Assignments />} />
           <Route path="/competitions" element={<Competitions />} />
           <Route path="/leaderboard"  element={<Leaderboard />} />
           <Route path="/profile"      element={<Profile />} />
+
+          {/* Admin */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/assignments"  element={<AdminRoute><ManageAssignments /></AdminRoute>} />
+          <Route path="/admin/competitions" element={<AdminRoute><ManageCompetitions /></AdminRoute>} />
+          <Route path="/admin/users"        element={<AdminRoute><ManageUsers /></AdminRoute>} />
+
         </Route>
 
-        {/* ── Pages admin (protégées) ── */}
-        <Route element={<AdminRoute><PageWrapper /></AdminRoute>}>
-          <Route path="/admin"               element={<AdminDashboard />} />
-          <Route path="/admin/assignments"   element={<ManageAssignments />} />
-          <Route path="/admin/competitions"  element={<ManageCompetitions />} />
-          <Route path="/admin/users"         element={<ManageUsers />} />
-        </Route>
-
-        {/* ── Fallback ── */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
       </Routes>

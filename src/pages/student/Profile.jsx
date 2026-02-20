@@ -137,7 +137,7 @@ function SubmissionRow({ sub }) {
 }
 
 // ─── Modal mot de passe ───────────────────────────────────────────────────────
-function PasswordModal({ onClose }) {
+function PasswordModal({ onClose, myProfile }) {
   const [current, setCurrent] = useState('')
   const [next, setNext]       = useState('')
   const [confirm, setConfirm] = useState('')
@@ -145,15 +145,26 @@ function PasswordModal({ onClose }) {
   const [error, setError]     = useState('')
   const [success, setSuccess] = useState(false)
 
-  const handleChange = async () => {
-    if (next !== confirm) return setError('Les mots de passe ne correspondent pas.')
-    if (next.length < 8)  return setError('Minimum 8 caractères.')
-    setLoading(true); setError('')
-    const { error: e } = await supabase.auth.updateUser({ password: next })
-    if (e) setError(e.message)
-    else { setSuccess(true); setTimeout(onClose, 1800) }
+ const handleChange = async () => {
+  if (next !== confirm) return setError('Les mots de passe ne correspondent pas.')
+  if (next.length < 8)  return setError('Minimum 8 caractères.')
+  setLoading(true); setError('')
+
+  const { error: signInErr } = await supabase.auth.signInWithPassword({
+    email: myProfile.email,
+    password: current,
+  })
+  if (signInErr) {
+    setError('Mot de passe actuel incorrect.')
     setLoading(false)
+    return
   }
+
+  const { error: e } = await supabase.auth.updateUser({ password: next })
+  if (e) setError(e.message)
+  else { setSuccess(true); setTimeout(onClose, 1800) }
+  setLoading(false)
+}
 
   return (
     <div style={{
@@ -210,7 +221,7 @@ function PasswordModal({ onClose }) {
 
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function Profile() {
-  const { profile: myProfile, logout } = useAuthStore()
+  const { profile: myProfile, logout, refreshProfile } = useAuthStore()
   const fileInputRef = useRef(null)
 
   const [editing, setEditing]       = useState(false)
@@ -280,6 +291,7 @@ export default function Profile() {
     if (error) {
       showToast('❌ Erreur lors de la sauvegarde.', '#FF4B6E')
     } else {
+      await refreshProfile()
       showToast('✓ Profil mis à jour !', '#00FF87')
       setEditing(false)
     }
@@ -621,7 +633,7 @@ export default function Profile() {
       </div>
 
       {/* Modal mot de passe */}
-      {showPwdModal && <PasswordModal onClose={() => setShowPwd(false)} />}
+      {showPwdModal && <PasswordModal onClose={() => setShowPwd(false)} myProfile={myProfile} />}
     </div>
   )
 }

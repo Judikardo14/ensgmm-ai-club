@@ -10,11 +10,11 @@ export const timeLeft = (date) =>
 export const isExpired = (date) => isPast(new Date(date))
 
 export const urgencyLevel = (deadline) => {
-  const diff = new Date(deadline) - new Date()
+  const diff  = new Date(deadline) - new Date()
   const hours = diff / (1000 * 60 * 60)
-  if (hours < 0)   return 'expired'
-  if (hours < 24)  return 'urgent'
-  if (hours < 72)  return 'soon'
+  if (hours < 0)  return 'expired'
+  if (hours < 24) return 'urgent'
+  if (hours < 72) return 'soon'
   return 'ok'
 }
 
