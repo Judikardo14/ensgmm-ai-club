@@ -51,7 +51,6 @@ function timeProgress(start, end) {
   return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)))
 }
 
-// Gradients par catégorie
 const BANNERS = {
   ml:      { bg: 'linear-gradient(135deg, #0a2040 0%, #0f3060 50%, #0a1a30 100%)', label: 'Machine Learning' },
   nlp:     { bg: 'linear-gradient(135deg, #1a0a30 0%, #3a0a60 50%, #1a0a30 100%)', label: 'NLP' },
@@ -68,7 +67,7 @@ function getBanner(comp) {
 }
 
 // ─── Modal détail / soumission ────────────────────────────────────────────────
-function CompModal({ comp, entry, onClose, onAction, profile }) {
+function CompModal({ comp, entry, onClose, onAction }) {
   const { user } = useAuthStore()
   const status = getStatus(comp)
   const banner = getBanner(comp)
@@ -83,12 +82,10 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
   const [error, setError] = useState('')
   const [drag, setDrag] = useState(false)
   const [leaderboard, setLeaderboard] = useState([])
-  const [view, setView] = useState('info') // 'info' | 'submit' | 'leaderboard'
-
- 
+  const [view, setView] = useState('info')
 
   const fetchLeaderboard = useCallback(async () => {
-  const { data } = await supabase
+    const { data } = await supabase
       .from('competition_entries')
       .select('user_id, score, profiles(full_name, avatar_url)')
       .eq('competition_id', comp.id)
@@ -96,12 +93,10 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
       .order('score', { ascending: false })
       .limit(10)
     setLeaderboard(data || [])
-    console.log('leaderboard data:', data)
-    console.log('view actuel:', view)
   }, [comp.id])
-  
+
   useEffect(() => {
-  fetchLeaderboard()
+    fetchLeaderboard()
   }, [fetchLeaderboard])
 
   const handleJoin = async () => {
@@ -128,11 +123,11 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
         const { data: urlData } = supabase.storage.from('competitions').getPublicUrl(path)
         fileUrl = urlData.publicUrl
       }
-      const { error: e } = await supabase
+      const { error: submitErr } = await supabase
         .from('competition_entries')
         .update({ file_url: fileUrl, notes: note || null, submitted_at: new Date().toISOString() })
         .eq('competition_id', comp.id).eq('user_id', user.id)
-      if (e) throw e
+      if (submitErr) throw submitErr
       onAction()
     } catch (err) { setError(err.message) }
     setLoading(false)
@@ -146,7 +141,7 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
       position:'fixed', inset:0, zIndex:1000,
       background:'rgba(3,5,7,0.9)', backdropFilter:'blur(10px)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:20,
-    }} onClick={e => e.target === e.currentTarget && onClose()}>
+    }} onClick={evt => evt.target === evt.currentTarget && onClose()}>
       <div style={{
         background:'var(--surface)', border:'1px solid var(--border2)',
         borderRadius:14, width:'100%', maxWidth:520,
@@ -177,7 +172,6 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
           }}>
             {banner.label}
           </div>
-          {/* Close btn */}
           <button onClick={onClose} style={{
             position:'absolute', top:10, left:12, zIndex:3,
             background:'rgba(0,0,0,0.4)', border:'1px solid rgba(255,255,255,0.1)',
@@ -209,7 +203,6 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
             </div>
           </div>
 
-          {/* Description */}
           {comp.description && (
             <div style={{
               fontSize:11, color:'var(--text3)', lineHeight:1.7,
@@ -220,7 +213,6 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
             </div>
           )}
 
-          {/* Progress bar */}
           {status === 'active' && (
             <div style={{ marginBottom:16 }}>
               <div style={{ display:'flex', justifyContent:'space-between', fontSize:9, color:'var(--text3)', letterSpacing:'0.06em', marginBottom:5 }}>
@@ -236,7 +228,7 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
           {/* Tabs nav */}
           <div style={{ display:'flex', gap:4, marginBottom:18, background:'var(--bg2)', borderRadius:8, padding:4 }}>
             {[['info','Infos'], ['leaderboard','Classement'], ...(isParticipant && status === 'active' ? [['submit','Soumettre']] : [])].map(([k,label]) => (
-              <button key={k} onClick={e => { e.stopPropagation(); setView(k) }} style={{
+              <button key={k} onClick={evt => { evt.stopPropagation(); setView(k) }} style={{
                 flex:1, padding:'6px 0',
                 background: view===k ? 'var(--surface)' : 'none',
                 border: view===k ? '1px solid var(--border)' : '1px solid transparent',
@@ -265,7 +257,6 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
                 ))}
               </div>
 
-              {/* CTA */}
               {status === 'active' && !isParticipant && (
                 <button onClick={handleJoin} disabled={loading} style={{
                   width:'100%', padding:'11px 0',
@@ -344,10 +335,10 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
               ))}
             </div>
           )}
+
           {/* ─ Vue : Soumettre ─ */}
           {view === 'submit' && (
             <div>
-              {/* Tabs fichier/lien */}
               <div style={{ display:'flex', gap:4, marginBottom:14, background:'var(--bg)', borderRadius:8, padding:4 }}>
                 {[['file','📁  Fichier'],['link','🔗  Lien']].map(([t,label]) => (
                   <button key={t} onClick={() => setTab(t)} style={{
@@ -364,9 +355,9 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
 
               {tab === 'file' && (
                 <div
-                  onDragOver={e => { e.preventDefault(); setDrag(true) }}
+                  onDragOver={evt => { evt.preventDefault(); setDrag(true) }}
                   onDragLeave={() => setDrag(false)}
-                  onDrop={e => { e.preventDefault(); setDrag(false); const f=e.dataTransfer.files[0]; if(f) setFile(f) }}
+                  onDrop={evt => { evt.preventDefault(); setDrag(false); const f=evt.dataTransfer.files[0]; if(f) setFile(f) }}
                   onClick={() => document.getElementById('comp-file-input').click()}
                   style={{
                     border:`2px dashed ${drag ? '#00FF87' : file ? '#00c468' : 'var(--border2)'}`,
@@ -374,7 +365,7 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
                     background: drag ? 'rgba(0,255,135,0.03)' : 'var(--bg2)', transition:'all 0.2s', marginBottom:12,
                   }}
                 >
-                  <input id="comp-file-input" type="file" style={{display:'none'}} onChange={e => setFile(e.target.files[0])} />
+                  <input id="comp-file-input" type="file" style={{display:'none'}} onChange={evt => setFile(evt.target.files[0])} />
                   <div style={{width:24,height:24,margin:'0 auto 8px',color:file?'#00c468':'var(--text3)'}}>
                     {file ? <Icon.Check /> : <Icon.Upload />}
                   </div>
@@ -390,18 +381,18 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
                   <div style={{fontSize:9,color:'var(--text3)',letterSpacing:'0.1em',marginBottom:6}}>URL</div>
                   <div style={{position:'relative'}}>
                     <div style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:13,height:13,color:'var(--text3)'}}><Icon.Link /></div>
-                    <input type="url" value={link} onChange={e=>setLink(e.target.value)}
+                    <input type="url" value={link} onChange={evt=>setLink(evt.target.value)}
                       placeholder="https://github.com/..."
                       style={{width:'100%',padding:'9px 12px 9px 30px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text)',fontSize:11,fontFamily:"'IBM Plex Mono',monospace",outline:'none'}}
-                      onFocus={e=>e.target.style.borderColor='#243347'} onBlur={e=>e.target.style.borderColor='var(--border)'}
+                      onFocus={evt=>evt.target.style.borderColor='#243347'} onBlur={evt=>evt.target.style.borderColor='var(--border)'}
                     />
                   </div>
                 </div>
               )}
 
-              <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Note pour les juges (optionnel)…" rows={2}
+              <textarea value={note} onChange={evt=>setNote(evt.target.value)} placeholder="Note pour les juges (optionnel)…" rows={2}
                 style={{width:'100%',padding:'9px 12px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text)',fontSize:11,fontFamily:"'IBM Plex Mono',monospace",resize:'none',outline:'none',marginBottom:12}}
-                onFocus={e=>e.target.style.borderColor='#243347'} onBlur={e=>e.target.style.borderColor='var(--border)'}
+                onFocus={evt=>evt.target.style.borderColor='#243347'} onBlur={evt=>evt.target.style.borderColor='var(--border)'}
               />
 
               {error && <div style={{fontSize:10,color:'#FF4B6E',background:'rgba(255,75,110,0.08)',border:'1px solid rgba(255,75,110,0.2)',borderRadius:6,padding:'7px 12px',marginBottom:10}}>{error}</div>}
@@ -455,10 +446,9 @@ function CompCard({ comp, entry, onClick }) {
         borderRadius:10, overflow:'hidden', cursor:'pointer',
         transition:'all 0.2s',
       }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor='#243347'; e.currentTarget.style.transform='translateY(-2px)' }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.transform='translateY(0)' }}
+      onMouseEnter={evt => { evt.currentTarget.style.borderColor='#243347'; evt.currentTarget.style.transform='translateY(-2px)' }}
+      onMouseLeave={evt => { evt.currentTarget.style.borderColor='var(--border)'; evt.currentTarget.style.transform='translateY(0)' }}
     >
-      {/* Banner */}
       <div style={{ height:70, position:'relative', background:banner.bg, overflow:'hidden' }}>
         <div style={{
           position:'absolute', inset:0,
@@ -489,7 +479,6 @@ function CompCard({ comp, entry, onClick }) {
         </div>
       </div>
 
-      {/* Body */}
       <div style={{ padding:'14px 16px' }}>
         <div style={{ fontSize:12, color:'var(--text)', letterSpacing:'0.02em', marginBottom:8 }}>
           {comp.title}
@@ -547,7 +536,7 @@ const FILTERS = ['Toutes', 'Actives', 'À venir', 'Terminées', 'Mes inscription
 export default function Competitions() {
   const { user } = useAuthStore()
   const [competitions, setCompetitions] = useState([])
-  const [entries, setEntries] = useState({})         // { competition_id: entry }
+  const [entries, setEntries] = useState({})
   const [filter, setFilter] = useState('Toutes')
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
@@ -560,7 +549,6 @@ export default function Competitions() {
       supabase.from('competition_entries').select('*').eq('user_id', user.id),
     ])
 
-    // Récupérer le nombre de participants par compétition
     const counts = {}
     if (comps) {
       await Promise.all(comps.map(async c => {
@@ -574,7 +562,7 @@ export default function Competitions() {
 
     setCompetitions((comps || []).map(c => ({ ...c, participant_count: counts[c.id] || 0 })))
     const map = {}
-    ents?.forEach(e => { map[e.competition_id] = e })
+    ents?.forEach(ent => { map[ent.competition_id] = ent })
     setEntries(map)
     setLoading(false)
   }, [user.id])
@@ -583,10 +571,10 @@ export default function Competitions() {
 
   const filtered = competitions.filter(c => {
     const status = getStatus(c)
-    if (filter === 'Toutes')         return true
-    if (filter === 'Actives')        return status === 'active'
-    if (filter === 'À venir')        return status === 'upcoming'
-    if (filter === 'Terminées')      return status === 'ended'
+    if (filter === 'Toutes')           return true
+    if (filter === 'Actives')          return status === 'active'
+    if (filter === 'À venir')          return status === 'upcoming'
+    if (filter === 'Terminées')        return status === 'ended'
     if (filter === 'Mes inscriptions') return !!entries[c.id]
     return true
   })
@@ -595,7 +583,7 @@ export default function Competitions() {
     active:    competitions.filter(c => getStatus(c) === 'active').length,
     upcoming:  competitions.filter(c => getStatus(c) === 'upcoming').length,
     joined:    Object.keys(entries).length,
-    submitted: Object.values(entries).filter(e => e.submitted_at).length,
+    submitted: Object.values(entries).filter(ent => ent.submitted_at).length,
   }
 
   const handleAction = () => {
@@ -613,7 +601,6 @@ export default function Competitions() {
         @keyframes slideIn{ from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
       `}</style>
 
-      {/* Toast */}
       {toast && (
         <div style={{
           position:'fixed', top:20, right:20, zIndex:2000,
@@ -624,7 +611,6 @@ export default function Competitions() {
         }}>{toast}</div>
       )}
 
-      {/* Header */}
       <div style={{ marginBottom:24 }}>
         <div style={{ fontSize:9, color:'var(--text3)', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:6 }}>
           ENSGMM · AI CLUB
@@ -647,7 +633,6 @@ export default function Competitions() {
         </div>
       </div>
 
-      {/* Stats */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:24, animation:'fadeUp 0.35s 0.05s ease both' }}>
         {[
           { label:'Actives',    value:stats.active,    color:'#00FF87', bg:'rgba(0,255,135,0.08)' },
@@ -666,7 +651,6 @@ export default function Competitions() {
         ))}
       </div>
 
-      {/* Filtres */}
       <div style={{ display:'flex', gap:6, marginBottom:20, flexWrap:'wrap', animation:'fadeUp 0.35s 0.1s ease both' }}>
         {FILTERS.map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
@@ -680,7 +664,6 @@ export default function Competitions() {
         ))}
       </div>
 
-      {/* Grid */}
       <div style={{
         display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))',
         gap:14, animation:'fadeUp 0.35s 0.15s ease both',
@@ -699,7 +682,6 @@ export default function Competitions() {
         }
       </div>
 
-      {/* Modal */}
       {selected && (
         <CompModal
           comp={selected}
