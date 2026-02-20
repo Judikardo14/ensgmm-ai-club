@@ -550,11 +550,9 @@ export default function Dashboard() {
   }
 
   const fetchActivities = async () => {
-    const { data } = await supabase.from('activities')
-      .select('*, profiles(full_name)')
-      .order('created_at', { ascending: false }).limit(5)
-    setActivities(data || [])
-  }
+  const { data } = await supabase.rpc('get_my_activity_feed')
+  setActivities(data || [])
+}
 
   const fetchCompetitions = async () => {
   const now = new Date().toISOString()
