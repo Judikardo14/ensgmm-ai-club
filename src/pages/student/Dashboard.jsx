@@ -388,6 +388,21 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
 function CompCarousel({ competitions }) {
   const [idx, setIdx] = useState(0)
 
+  const BANNERS = {
+    ml:      'linear-gradient(135deg, #0a2040 0%, #0f3060 50%, #0a1a30 100%)',
+    nlp:     'linear-gradient(135deg, #1a0a30 0%, #3a0a60 50%, #1a0a30 100%)',
+    cv:      'linear-gradient(135deg, #001a0a 0%, #003320 50%, #001a0a 100%)',
+    default: 'linear-gradient(135deg, #0a0a20 0%, #1a1a40 50%, #0a0a20 100%)',
+  }
+
+  const getBannerBg = (comp) => {
+    const cat = (comp.category || '').toLowerCase()
+    if (cat.includes('nlp') || cat.includes('langue') || cat.includes('text')) return BANNERS.nlp
+    if (cat.includes('vision') || cat.includes('image') || cat.includes('cv')) return BANNERS.cv
+    if (cat.includes('ml') || cat.includes('machine') || cat.includes('data')) return BANNERS.ml
+    return BANNERS.default
+  }
+
   if (competitions.length === 0) return (
     <div style={{ background: '#0a1018', border: '1px solid #1a2535', borderRadius: 10, padding: 16 }}>
       <SectionTitle>Compétitions actives</SectionTitle>
@@ -422,13 +437,18 @@ function CompCarousel({ competitions }) {
       </div>
 
       <div style={{ background: '#060a0f', border: `1px solid ${urgentColor}33`, borderRadius: 10, overflow: 'hidden', transition: 'border-color 0.3s' }}>
-        <div style={{ height: 36, background: 'linear-gradient(135deg, #0a2040, #0f3060)', position: 'relative' }}>
+        {/* Banner colorée */}
+        <div style={{ height: 40, background: getBannerBg(comp), position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)', backgroundSize: '14px 14px' }}/>
           <div style={{ position: 'absolute', top: 8, right: 8, width: 5, height: 5, borderRadius: '50%', background: '#00FF87', boxShadow: '0 0 6px #00FF87', animation: 'pulse 1.5s infinite' }}/>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', fontFamily: "'Unbounded',sans-serif" }}>
+            {(comp.category || 'IA').toUpperCase()}
+          </div>
         </div>
+
         <div style={{ padding: '12px 14px' }}>
           <div style={{ fontSize: 11, color: '#dce8f5', marginBottom: 10, lineHeight: 1.4 }}>{comp.title}</div>
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#3d5268', marginBottom: 3 }}>
               <span>Temps écoulé</span>
               <span style={{ color: urgentColor }}>{progress}%</span>
@@ -437,9 +457,27 @@ function CompCarousel({ competitions }) {
               <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${urgentColor}66, ${urgentColor})`, transition: 'width 1s ease' }}/>
             </div>
           </div>
-          <div style={{ fontSize: 9, color: '#3d5268' }}>{comp.participant_count || 0} participants</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: 9, color: '#3d5268' }}>{comp.participant_count || 0} participants</div>
+            {comp.prize && <div style={{ fontSize: 9, color: '#FFB830', letterSpacing: '0.04em' }}>🏆 {comp.prize}</div>}
+          </div>
         </div>
       </div>
+
+      {/* Bouton voir/soumettre */}
+      <a href="/competitions" style={{
+        display: 'block', textAlign: 'center', marginTop: 10,
+        padding: '8px 0', background: 'none',
+        border: '1px solid rgba(0,255,135,0.2)', borderRadius: 7,
+        color: '#00FF87', fontSize: 10,
+        fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
+        textDecoration: 'none', transition: 'all 0.2s',
+      }}
+      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,255,135,0.05)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'none'}
+      >
+        VOIR LES COMPÉTITIONS →
+      </a>
 
       {competitions.length > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
