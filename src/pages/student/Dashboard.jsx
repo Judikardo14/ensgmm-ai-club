@@ -745,13 +745,17 @@ export default function Dashboard() {
                 {competitions.length > 1 && (
                   <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
                     {competitions.map((_, i) => (
-                      <div key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 14 : 5, height: 5, borderRadius: 3, background: i === idx ? '#00FF87' : '#1a2535', cursor: 'pointer', transition: 'all 0.3s' }}/>
+                      <div key={i} onClick={() => setCompIdx(i)} style={{ width: i === compIdx ? 14 : 5, height: 5, borderRadius: 3, background: i === compIdx ? '#00FF87' : '#1a2535', cursor: 'pointer', transition: 'all 0.3s' }}/>
                     ))}
                   </div>
                 )}
               </div>
             )
           })()}
+
+        </div> {/* fin colonne droite */}
+      </div> {/* fin grid principale */}
+
       {/* ── Modal soumission ── */}
       {submitTarget && (
         <SubmitModal
