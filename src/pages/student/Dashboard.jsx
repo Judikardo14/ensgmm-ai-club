@@ -452,10 +452,15 @@ export default function Dashboard() {
   }
 
   const fetchCompetitions = async () => {
-    const { data } = await supabase.from('competitions')
-      .select('*').eq('status', 'active').limit(10)
-    setCompetitions(data || [])
-  }
+  const now = new Date().toISOString()
+  const { data } = await supabase
+    .from('competitions')
+    .select('*')
+    .lte('start_date', now)  // déjà commencée
+    .gte('end_date', now)    // pas encore terminée
+    .limit(10)
+  setCompetitions(data || [])
+}
 
   // Realtime leaderboard
   useEffect(() => {
