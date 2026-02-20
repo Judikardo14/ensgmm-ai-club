@@ -178,19 +178,14 @@ function LeaderRow({ profile, rank, isMe, maxPoints }) {
           {profile.full_name}
           {isMe && (
             <span style={{
-        flex: 1, fontSize: 11,
-        color: e.user_id === user?.id ? '#2C7BE5' : 'var(--text)',
-        letterSpacing: '0.02em'
-      }}>
-        {e.profiles?.full_name || 'Inconnu'}
-        {e.user_id === user?.id && (
-          <span style={{
-            marginLeft: 6, fontSize: 8, color: '#2C7BE5',
-            background: 'rgba(44,123,229,0.15)',
-            padding: '1px 5px', borderRadius: 3
-          }}>VOUS</span>
-        )}
-      </span>
+              marginLeft: 6, fontSize: 8, color: '#2C7BE5',
+              background: 'rgba(44,123,229,0.15)',
+              padding: '1px 5px', borderRadius: 3,
+              fontFamily: "'IBM Plex Mono',monospace",
+              letterSpacing: '0.08em', flexShrink: 0,
+            }}>
+              VOUS
+            </span>
           )}
         </div>
         {profile.filiere && (
