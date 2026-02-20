@@ -68,7 +68,10 @@ export default function App() {
         <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-        <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+        
+        {/* Ni public ni privé — accessible toujours */}
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         
         {/* ── Privé avec layout ── */}
         <Route element={<PrivateRoute><PageWrapper /></PrivateRoute>}>
