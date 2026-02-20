@@ -106,10 +106,10 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
 
   const handleJoin = async () => {
     setLoading(true); setError('')
-    const { error: e } = await supabase.from('competition_entries').insert({
+    const { error: joinErr } = await supabase.from('competition_entries').insert({
       competition_id: comp.id, user_id: user.id,
     })
-    if (e) setError(e.message)
+    if (joinErr) setError(joinErr.message)
     else onAction()
     setLoading(false)
   }
