@@ -99,16 +99,7 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
   }, [comp.id])
   
   useEffect(() => {
-    fetchLeaderboard()
-  const channel = supabase.channel(`lb-${comp.id}`)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'competition_entries',
-        filter: `competition_id=eq.${comp.id}`,
-      }, fetchLeaderboard)
-      .subscribe()
-    return () => supabase.removeChannel(channel)
+  fetchLeaderboard()
   }, [fetchLeaderboard])
 
   const handleJoin = async () => {
