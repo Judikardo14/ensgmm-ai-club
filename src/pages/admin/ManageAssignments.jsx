@@ -452,7 +452,7 @@ export default function ManageAssignments() {
 
                 {/* Actions */}
                 <div className="manage-row-actions">
-                  // Dans manage-row-actions, avant le bouton Modifier
+                  
                   <button onClick={() => setViewing(a)} style={{ padding: '6px 11px', background: 'none', border: '1px solid var(--border2)', borderRadius: 6, cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em', transition: 'all 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.color = '#2C7BE5'; e.currentTarget.style.borderColor = '#2C7BE5' }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'var(--text3)'; e.currentTarget.style.borderColor = 'var(--border2)' }}>
@@ -489,6 +489,12 @@ export default function ManageAssignments() {
           title={deleting.title}
           onClose={() => setDeleting(null)}
           onConfirm={() => handleDelete(deleting)}
+        />
+      )}
+      {viewing && (
+        <SubmissionsModal
+          assignment={viewing}
+          onClose={() => setViewing(null)}
         />
       )}
     </div>
