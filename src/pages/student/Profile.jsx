@@ -266,7 +266,7 @@ export default function Profile() {
         .from('submissions')
         .select('id, status, score, notes, feedback, file_url, submitted_at, assignments(title, max_score)')
         .eq('user_id', myProfile.id)
-        .order('submitted_at', { ascending: false })
+        .order('submitted_at', { ascending: false }),
       supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
