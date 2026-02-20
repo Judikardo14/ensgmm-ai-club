@@ -204,71 +204,70 @@ export default function Register() {
 
           {/* ── Étape 1 : Identité ── */}
           {step === 1 && (
-            <div>
-              <div style={styles.formRow}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>PRÉNOM *</label>
-                  <input
-                    style={styles.input}
-                    placeholder="Judikardo"
-                    value={form.firstName}
-                    autoCorrect="off"
-                    autoCapitalize="words"
-                    spellCheck="false"
-                    onChange={e => set('firstName', e.target.value)}
-                    onFocus={e => e.target.style.borderColor = '#00c468'}
-                    onBlur={e => e.target.style.borderColor = '#1a2535'}
-                  />
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>NOM *</label>
-                  <input
-                    style={styles.input}
-                    placeholder="Epsilon"
-                    value={form.lastName}
-                    autoCorrect="off"
-                    autoCapitalize="words"
-                    spellCheck="false"
-                    onChange={e => set('lastName', e.target.value)}
-                    onFocus={e => e.target.style.borderColor = '#00c468'}
-                    onBlur={e => e.target.style.borderColor = '#1a2535'}
-                  />
-                </div>
-              </div>
-          
+          <div>
+            <div style={styles.formRow}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>EMAIL *</label>
-                <input type="email" style={styles.input} placeholder="prenom.nom@gmail.com" value={form.email}
-                  onChange={e => set('email', e.target.value)}
+                <label style={styles.label}>PRÉNOM *</label>
+                <input
+                  style={styles.input}
+                  placeholder="Judikardo"
+                  value={form.firstName}
+                  autoCorrect="off"
+                  autoCapitalize="words"
+                  spellCheck="false"
+                  onChange={e => set('firstName', e.target.value)}
+                  onFocus={e => e.target.style.borderColor = '#00c468'}
+                  onBlur={e => e.target.style.borderColor = '#1a2535'}
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>NOM *</label>
+                <input
+                  style={styles.input}
+                  placeholder="Epsilon"
+                  value={form.lastName}
+                  autoCorrect="off"
+                  autoCapitalize="words"
+                  spellCheck="false"
+                  onChange={e => set('lastName', e.target.value)}
+                  onFocus={e => e.target.style.borderColor = '#00c468'}
+                  onBlur={e => e.target.style.borderColor = '#1a2535'}
+                />
+              </div>
+            </div>
+        
+            <div style={styles.formGroup}>
+              <label style={styles.label}>EMAIL *</label>
+              <input type="email" style={styles.input} placeholder="prenom.nom@gmail.com" value={form.email}
+                onChange={e => set('email', e.target.value)}
+                onFocus={e => e.target.style.borderColor = '#00c468'}
+                onBlur={e => e.target.style.borderColor = '#1a2535'} />
+            </div>
+        
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>FILIÈRE *</label>
+                <select style={styles.select} value={form.filiere} onChange={e => set('filiere', e.target.value)}>
+                  <option value="">Choisir...</option>
+                  <option value="GMM">GMM</option>
+                  <option value="GI">Prépa</option>
+                  <option value="GC">TP</option>
+                  <option value="GE">GEP</option>
+                  <option value="GP">Autre</option>
+                </select>
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>PROMOTION *</label>
+                <input type="number" style={styles.input} placeholder="2026" value={form.promo}
+                  onChange={e => set('promo', e.target.value)} min="2020" max="2035"
                   onFocus={e => e.target.style.borderColor = '#00c468'}
                   onBlur={e => e.target.style.borderColor = '#1a2535'} />
               </div>
-          
-              <div style={styles.formRow}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>FILIÈRE *</label>
-                  <select style={styles.select} value={form.filiere} onChange={e => set('filiere', e.target.value)}>
-                    <option value="">Choisir...</option>
-                    <option value="GMM">GMM</option>
-                    <option value="GI">Prépa</option>
-                    <option value="GC">TP</option>
-                    <option value="GE">GEP</option>
-                    <option value="GP">Autre</option>
-                  </select>
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>PROMOTION *</label>
-                  <input type="number" style={styles.input} placeholder="2026" value={form.promo}
-                    onChange={e => set('promo', e.target.value)} min="2020" max="2035"
-                    onFocus={e => e.target.style.borderColor = '#00c468'}
-                    onBlur={e => e.target.style.borderColor = '#1a2535'} />
-                </div>
-              </div>
-          
-              <button onClick={nextStep} style={styles.btnPrimary}>SUIVANT →</button>
             </div>
-          )}
-
+        
+            <button onClick={nextStep} style={styles.btnPrimary}>SUIVANT →</button>
+          </div>
+        )}
           {/* ── Étape 2 : Mot de passe ── */}
           {step === 2 && (
             <div>
