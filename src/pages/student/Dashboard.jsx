@@ -435,7 +435,7 @@ export default function Dashboard() {
     const [{ data }, { count }] = await Promise.all([
       supabase.from('profiles')
         .select('id, full_name, total_points')
-        .order('total_points', { ascending: false }).limit(5),
+        .order('total_points', { ascending: false }).limit(10),
       supabase.from('profiles')
         .select('*', { count: 'exact', head: true })
         .gt('total_points', profile?.total_points || 0),
