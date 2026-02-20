@@ -235,8 +235,7 @@ export default function Register() {
                   />
                 </div>
               </div>
-              </div>
-
+          
               <div style={styles.formGroup}>
                 <label style={styles.label}>EMAIL *</label>
                 <input type="email" style={styles.input} placeholder="prenom.nom@gmail.com" value={form.email}
@@ -244,7 +243,7 @@ export default function Register() {
                   onFocus={e => e.target.style.borderColor = '#00c468'}
                   onBlur={e => e.target.style.borderColor = '#1a2535'} />
               </div>
-
+          
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>FILIÈRE *</label>
@@ -265,7 +264,7 @@ export default function Register() {
                     onBlur={e => e.target.style.borderColor = '#1a2535'} />
                 </div>
               </div>
-
+          
               <button onClick={nextStep} style={styles.btnPrimary}>SUIVANT →</button>
             </div>
           )}
