@@ -6,11 +6,8 @@ export const useAuthStore = create((set, get) => ({
   profile: null,
   loading: true,
 
-  // ─── Initialisation ────────────────────────────────────────────────────────
   init: async () => {
-    // 1. Session existante au chargement
     const { data: { session } } = await supabase.auth.getSession()
-
     if (session?.user) {
       const profile = await fetchProfile(session.user.id)
       set({ user: session.user, profile, loading: false })
@@ -18,29 +15,33 @@ export const useAuthStore = create((set, get) => ({
       set({ user: null, profile: null, loading: false })
     }
 
-    // 2. Écouter les changements d'auth
+    let isFetchingProfile = false
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_OUT') {
-          // Déconnexion explicite (logout ou signOut après inscription)
           set({ user: null, profile: null, loading: false })
           return
         }
 
         if (event === 'SIGNED_IN' && session?.user) {
+          // Évite un double fetch si TOKEN_REFRESHED arrive en même temps
+          if (isFetchingProfile) return
+          isFetchingProfile = true
           const profile = await fetchProfile(session.user.id)
           set({ user: session.user, profile, loading: false })
+          isFetchingProfile = false
           return
         }
 
         if (event === 'TOKEN_REFRESHED' && session?.user) {
-          // Token rafraîchi silencieusement — on ne refetch pas le profil
-          const { profile } = get()
-          set({ user: session.user, profile, loading: false })
+          // Ne touche pas au profil — juste mettre à jour le user
+          set(state => ({ user: session.user, profile: state.profile, loading: false }))
           return
         }
 
-        // Cas par défaut — toujours sortir du loading
+        if (event === 'PASSWORD_RECOVERY') return
+
         set({ loading: false })
       }
     )
@@ -48,13 +49,11 @@ export const useAuthStore = create((set, get) => ({
     set({ _subscription: subscription })
   },
 
-  // ─── Déconnexion ───────────────────────────────────────────────────────────
   logout: async () => {
     await supabase.auth.signOut()
     set({ user: null, profile: null })
   },
 
-  // ─── Rafraîchir le profil (après modification) ─────────────────────────────
   refreshProfile: async () => {
     const { user } = get()
     if (!user) return
@@ -63,29 +62,20 @@ export const useAuthStore = create((set, get) => ({
   },
 }))
 
-// ─── Helper : fetch profil avec retry robuste ─────────────────────────────────
-// Le trigger crée le profil après insertion dans auth.users.
-// On retente jusqu'à 8 fois avec délai croissant.
-// Si après tout ça le profil n'existe toujours pas, on le crée manuellement.
 async function fetchProfile(userId, retries = 8) {
   for (let i = 0; i < retries; i++) {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
-
     if (data) return data
-
-    // Délai croissant : 300ms, 500ms, 700ms, 900ms...
     const delay = 300 + i * 200
     await new Promise(r => setTimeout(r, delay))
   }
 
-  // Dernier recours : créer le profil manuellement si le trigger a échoué
   const { data: userData } = await supabase.auth.getUser()
   const user = userData?.user
-
   if (!user) return null
 
   const fallbackProfile = {
