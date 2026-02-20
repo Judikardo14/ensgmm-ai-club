@@ -35,7 +35,8 @@ export const useAuthStore = create((set, get) => ({
 
         if (event === 'TOKEN_REFRESHED' && session?.user) {
           // Token rafraîchi silencieusement — on ne refetch pas le profil
-          set({ user: session.user, loading: false })
+          const { profile } = get()
+          set({ user: session.user, profile, loading: false })
           return
         }
 
