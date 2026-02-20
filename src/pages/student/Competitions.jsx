@@ -111,39 +111,53 @@ function CompModal({ comp, entry, onClose, onAction }) {
   }
 
   const handleSubmit = async () => {
-    if (tab === 'file' && !file) return setError('Sélectionner un fichier.')
-    if (tab === 'link' && !link.trim()) return setError('Entrer un lien.')
-    setLoading(true); setError('')
-    try {
-      let fileUrl = link.trim()
-      if (tab === 'file') {
-        const ext = file.name.split('.').pop()
-        const path = `competitions/${comp.id}/${user.id}/${Date.now()}.${ext}`
-        const { error: upErr } = await supabase.storage.from('competitions').upload(path, file, { upsert: true })
-        if (upErr) throw upErr
-        const { data: urlData } = supabase.storage.from('competitions').getPublicUrl(path)
-        fileUrl = urlData.publicUrl
-      }
-  
-      // Upsert au lieu de update — crée la ligne si elle n'existe pas
-      const { error: submitErr } = await supabase
+  if (tab === 'file' && !file) return setError('Sélectionner un fichier.')
+  if (tab === 'link' && !link.trim()) return setError('Entrer un lien.')
+  setLoading(true); setError('')
+  try {
+    // Vérifier le nombre de soumissions déjà effectuées
+    if (comp.max_submissions) {
+      const { count } = await supabase
         .from('competition_entries')
-        .upsert({
-          competition_id: comp.id,
-          user_id: user.id,
-          file_url: fileUrl,
-          notes: note || null,
-          submitted_at: new Date().toISOString(),
-        }, { onConflict: 'competition_id,user_id' })
-  
-      if (submitErr) throw submitErr
-      onAction()
-    } catch (err) {
-      setError(err.message)
-    }
-    setLoading(false)
-  }
+        .select('*', { count: 'exact', head: true })
+        .eq('competition_id', comp.id)
+        .eq('user_id', user.id)
+        .not('submitted_at', 'is', null)
 
+      if (count >= comp.max_submissions) {
+        setError(`Limite atteinte : ${comp.max_submissions} soumission${comp.max_submissions > 1 ? 's' : ''} maximum.`)
+        setLoading(false)
+        return
+      }
+    }
+
+    let fileUrl = link.trim()
+    if (tab === 'file') {
+      const ext = file.name.split('.').pop()
+      const path = `competitions/${comp.id}/${user.id}/${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage.from('competitions').upload(path, file, { upsert: true })
+      if (upErr) throw upErr
+      const { data: urlData } = supabase.storage.from('competitions').getPublicUrl(path)
+      fileUrl = urlData.publicUrl
+    }
+
+    const { error: submitErr } = await supabase
+      .from('competition_entries')
+      .upsert({
+        competition_id: comp.id,
+        user_id: user.id,
+        file_url: fileUrl,
+        notes: note || null,
+        submitted_at: new Date().toISOString(),
+      }, { onConflict: 'competition_id,user_id' })
+
+    if (submitErr) throw submitErr
+    onAction()
+  } catch (err) {
+    setError(err.message)
+  }
+  setLoading(false)
+}
   const isParticipant = !!entry
   const hasSubmitted  = entry?.submitted_at
 
@@ -280,7 +294,11 @@ function CompModal({ comp, entry, onClose, onAction }) {
                   {loading ? 'INSCRIPTION…' : 'REJOINDRE LA COMPÉTITION →'}
                 </button>
               )}
-              {isParticipant && status === 'active' && !hasSubmitted && (
+             {isParticipant && status === 'active' && (
+                comp.max_submissions
+                  ? (entry?.submission_count || 0) < comp.max_submissions
+                  : !hasSubmitted
+              ) && (
                 <button onClick={() => setView('submit')} style={{
                   width:'100%', padding:'11px 0',
                   background:'none', border:'1px solid rgba(0,255,135,0.3)',
@@ -289,7 +307,10 @@ function CompModal({ comp, entry, onClose, onAction }) {
                   fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.1em',
                   transition:'all 0.2s',
                 }}>
-                  SOUMETTRE MON TRAVAIL →
+                  {comp.max_submissions
+                    ? `SOUMETTRE → (${entry?.submission_count || 0}/${comp.max_submissions})`
+                    : 'SOUMETTRE MON TRAVAIL →'
+                  }
                 </button>
               )}
               {hasSubmitted && (
