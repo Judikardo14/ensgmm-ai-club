@@ -453,7 +453,7 @@ export default function Dashboard() {
 
   const fetchCompetitions = async () => {
     const { data } = await supabase.from('competitions')
-      .select('*').eq('status', 'active').limit(2)
+      .select('*').eq('status', 'active').limit(10)
     setCompetitions(data || [])
   }
 
