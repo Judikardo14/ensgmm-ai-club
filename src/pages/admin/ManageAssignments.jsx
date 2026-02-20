@@ -12,6 +12,8 @@ const Icon = {
   Users:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
   Search: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
   AlertTriangle: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  Check: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  Eye:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
 }
 
 const EMPTY_FORM = { title: '', description: '', type: 'homework', deadline: '', max_score: '' }
@@ -184,6 +186,136 @@ function UrgencyBadge({ deadline }) {
   return <span style={{ fontSize: 8, padding: '2px 7px', borderRadius: 4, background: s.bg, color: s.color, letterSpacing: '0.08em' }}>{s.label}</span>
 }
 
+function SubmissionsModal({ assignment, onClose }) {
+  const [submissions, setSubmissions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [grading, setGrading] = useState({}) // { id: { score, feedback } }
+  const [saving, setSaving] = useState(null)
+  const [toast, setToast] = useState(null)
+
+  useEffect(() => {
+    supabase
+      .from('submissions')
+      .select('*, profiles(full_name)')
+      .eq('assignment_id', assignment.id)
+      .order('submitted_at', { ascending: false })
+      .then(({ data }) => {
+        setSubmissions(data || [])
+        const init = {}
+        data?.forEach(s => {
+          init[s.id] = { score: s.score ?? '', feedback: s.feedback || '' }
+        })
+        setGrading(init)
+        setLoading(false)
+      })
+  }, [assignment.id])
+
+  const handleGrade = async (sub) => {
+    setSaving(sub.id)
+    const g = grading[sub.id]
+    await supabase.from('submissions').update({
+      score:    g.score !== '' ? parseInt(g.score) : null,
+      feedback: g.feedback.trim() || null,
+      status:   'graded',
+    }).eq('id', sub.id)
+    setSaving(null)
+    setToast('✓ Noté !')
+    setTimeout(() => setToast(null), 2000)
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(3,5,7,0.88)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border2)', borderRadius: 14, width: '100%', maxWidth: 620, padding: '26px', boxShadow: '0 24px 64px rgba(0,0,0,0.7)', animation: 'fadeUp 0.25s ease both', maxHeight: '85vh', overflowY: 'auto' }}>
+
+        {toast && (
+          <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 2000, background: 'rgba(0,255,135,0.12)', border: '1px solid rgba(0,255,135,0.3)', borderRadius: 8, padding: '10px 16px', fontSize: 11, color: '#00FF87' }}>{toast}</div>
+        )}
+
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>Soumissions</div>
+            <div style={{ fontSize: 14, color: 'var(--text)' }}>{assignment.title}</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)' }}>
+            <div style={{ width: 14, height: 14 }}><Icon.X /></div>
+          </button>
+        </div>
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text3)', fontSize: 11 }}>Chargement…</div>
+        ) : submissions.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text3)', fontSize: 11 }}>Aucune soumission pour ce devoir.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {submissions.map(sub => (
+              <div key={sub.id} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                {/* Étudiant */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500 }}>
+                    {sub.profiles?.full_name || 'Inconnu'}
+                  </div>
+                  <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.06em' }}>
+                    {sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('fr-FR') : '—'}
+                  </div>
+                </div>
+
+                {/* Note de l'étudiant */}
+                {sub.notes && (
+                  <div style={{ marginBottom: 10, padding: '8px 12px', background: 'rgba(44,123,229,0.06)', border: '1px solid rgba(44,123,229,0.15)', borderRadius: 6, fontSize: 10, color: '#2C7BE5', lineHeight: 1.6 }}>
+                    <span style={{ color: 'var(--text3)', marginRight: 6 }}>Note étudiant :</span>
+                    {sub.notes}
+                  </div>
+                )}
+
+                {/* Lien fichier */}
+                {sub.file_url && (
+                  <a href={sub.file_url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#00c468', marginBottom: 12, textDecoration: 'none' }}>
+                    <div style={{ width: 11, height: 11 }}><Icon.File /></div>
+                    Voir le fichier soumis
+                  </a>
+                )}
+
+                {/* Notation */}
+                <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 8, marginBottom: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.1em', marginBottom: 5 }}>SCORE</div>
+                    <input
+                      type="number"
+                      value={grading[sub.id]?.score ?? ''}
+                      onChange={e => setGrading(g => ({ ...g, [sub.id]: { ...g[sub.id], score: e.target.value } }))}
+                      placeholder={assignment.max_score ? `/ ${assignment.max_score}` : 'pts'}
+                      style={{ ...inputStyle, padding: '8px 10px' }}
+                      onFocus={e => e.target.style.borderColor = '#243347'}
+                      onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.1em', marginBottom: 5 }}>FEEDBACK</div>
+                    <input
+                      type="text"
+                      value={grading[sub.id]?.feedback ?? ''}
+                      onChange={e => setGrading(g => ({ ...g, [sub.id]: { ...g[sub.id], feedback: e.target.value } }))}
+                      placeholder="Commentaire pour l'étudiant…"
+                      style={{ ...inputStyle, padding: '8px 10px' }}
+                      onFocus={e => e.target.style.borderColor = '#243347'}
+                      onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                    />
+                  </div>
+                </div>
+
+                <button onClick={() => handleGrade(sub)} disabled={saving === sub.id} style={{ padding: '7px 14px', background: saving === sub.id ? '#00c468' : '#00FF87', border: 'none', borderRadius: 6, cursor: 'pointer', color: '#030507', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace", fontWeight: 700, letterSpacing: '0.08em' }}>
+                  {saving === sub.id ? 'ENREG…' : '✓ NOTER'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function ManageAssignments() {
   const [assignments, setAssignments] = useState([])
@@ -193,6 +325,7 @@ export default function ManageAssignments() {
   const [modal, setModal]       = useState(null) // null | 'create' | assignment object
   const [deleting, setDeleting] = useState(null)
   const [toast, setToast]       = useState(null)
+  const [viewing, setViewing] = useState(null) // dans les états en haut
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
@@ -319,6 +452,13 @@ export default function ManageAssignments() {
 
                 {/* Actions */}
                 <div className="manage-row-actions">
+                  // Dans manage-row-actions, avant le bouton Modifier
+                  <button onClick={() => setViewing(a)} style={{ padding: '6px 11px', background: 'none', border: '1px solid var(--border2)', borderRadius: 6, cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em', transition: 'all 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#2C7BE5'; e.currentTarget.style.borderColor = '#2C7BE5' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--text3)'; e.currentTarget.style.borderColor = 'var(--border2)' }}>
+                    <div style={{ width: 11, height: 11 }}><Icon.Eye /></div>
+                    {submissionCounts[a.id] || 0} soumissions
+                  </button>
                   <button onClick={() => setModal(a)} style={{ padding: '6px 11px', background: 'none', border: '1px solid var(--border2)', borderRadius: 6, cursor: 'pointer', color: 'var(--text3)', display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em', transition: 'all 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.borderColor = '#00FF87' }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'var(--text3)'; e.currentTarget.style.borderColor = 'var(--border2)' }}>
