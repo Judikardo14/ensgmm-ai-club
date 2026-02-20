@@ -119,6 +119,34 @@ function SubmissionRow({ sub }) {
             {sub.score}<span style={{ fontSize: 9, color: 'var(--text3)', marginLeft: 2 }}>pts</span>
           </div>
         )}
+        
+        {/* Note de l'étudiant */}
+        {sub.notes && (
+          <div style={{
+            marginTop: 8, padding: '8px 12px',
+            background: 'rgba(44,123,229,0.05)',
+            border: '1px solid rgba(44,123,229,0.15)',
+            borderRadius: 6, fontSize: 10,
+            color: '#2C7BE5', lineHeight: 1.6,
+          }}>
+            <span style={{ color: '#3d5268', marginRight: 6 }}>Ta note :</span>
+            {sub.notes}
+          </div>
+        )}
+        
+        {/* Feedback de l'admin */}
+        {sub.feedback && (
+          <div style={{
+            marginTop: 6, padding: '8px 12px',
+            background: 'rgba(0,255,135,0.05)',
+            border: '1px solid rgba(0,255,135,0.15)',
+            borderRadius: 6, fontSize: 10,
+            color: '#00c468', lineHeight: 1.6,
+          }}>
+            <span style={{ color: '#3d5268', marginRight: 6 }}>Feedback :</span>
+            {sub.feedback}
+          </div>
+        )}
         <span style={{
           fontSize: 9, padding: '2px 8px', borderRadius: 4,
           background: s.bg, color: s.color, letterSpacing: '0.06em',
