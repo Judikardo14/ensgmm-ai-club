@@ -101,8 +101,8 @@ function AssignmentCard({ item, isMobile }) {
       cursor:'pointer', flexWrap: isMobile ? 'wrap' : 'nowrap',
       transition:'border-color 0.2s',
     }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = urg.border}
-      onMouseLeave={e => e.currentTarget.style.borderColor = '#1a2535'}
+      onMouseEnter={evt => evt.currentTarget.style.borderColor = urg.border}
+      onMouseLeave={evt => evt.currentTarget.style.borderColor = '#1a2535'}
     >
       <div style={{
         width:36, height:36, borderRadius:8, flexShrink:0,
@@ -208,6 +208,7 @@ function ActivityItem({ color, title, desc, time, isLast }) {
 
 // ── Modal Soumission ──
 function SubmitModal({ competition, profile, onClose, onSuccess }) {
+  const { user } = useAuthStore()
   const [file, setFile]       = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
@@ -220,10 +221,11 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
       return setError('Seuls les fichiers CSV sont acceptés.')
 
     setLoading(true)
-    const path = `submissions/${competition.id}/${profile.id}_${Date.now()}.csv`
 
+    // 1. Upload dans le bucket competitions
+    const path = `competitions/${competition.id}/${profile.id}_${Date.now()}.csv`
     const { error: upErr } = await supabase.storage
-      .from('submissions')
+      .from('competitions')
       .upload(path, file, { upsert: true })
 
     if (upErr) {
@@ -232,15 +234,18 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
       return
     }
 
-    const { data: urlData } = supabase.storage.from('submissions').getPublicUrl(path)
+    const { data: urlData } = supabase.storage.from('competitions').getPublicUrl(path)
+    const fileUrl = urlData.publicUrl
 
-    const { error: dbErr } = await supabase.from('submissions').upsert({
-      user_id:        profile.id,
-      competition_id: competition.id,
-      file_url:       urlData.publicUrl,
-      status:         'submitted',
-      submitted_at:   new Date().toISOString(),
-    })
+    // 2. Mettre à jour competition_entries
+    const { error: dbErr } = await supabase
+      .from('competition_entries')
+      .update({
+        file_url:     fileUrl,
+        submitted_at: new Date().toISOString(),
+      })
+      .eq('competition_id', competition.id)
+      .eq('user_id', user.id)
 
     if (dbErr) {
       setError('Erreur sauvegarde : ' + dbErr.message)
@@ -258,18 +263,16 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
       position:'fixed', inset:0, zIndex:1000,
       background:'rgba(3,5,7,0.88)', backdropFilter:'blur(8px)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:20,
-    }} onClick={e => e.target === e.currentTarget && onClose()}>
+    }} onClick={evt => evt.target === evt.currentTarget && onClose()}>
       <div style={{
         background:'#0a1018', border:'1px solid #1a2535', borderRadius:14,
         width:'100%', maxWidth:420, padding:'28px 28px 24px',
         boxShadow:'0 24px 64px rgba(0,0,0,0.7)',
         position:'relative', overflow:'hidden',
       }}>
-        {/* top accent */}
         <div style={{ position:'absolute', top:0, left:0, right:0, height:1,
           background:'linear-gradient(90deg,transparent,rgba(0,255,135,0.3),transparent)' }}/>
 
-        {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
           <div>
             <div style={{ fontSize:9, color:'#3d5268', letterSpacing:'0.15em',
@@ -292,7 +295,6 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
           </div>
         ) : (
           <>
-            {/* Format info */}
             <div style={{
               display:'flex', alignItems:'center', gap:8, padding:'8px 12px',
               background:'rgba(0,255,135,0.05)', border:'1px solid rgba(0,255,135,0.15)',
@@ -306,7 +308,6 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
               </span>
             </div>
 
-            {/* Zone drop */}
             <label style={{
               display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
               gap:10, padding:'28px 16px',
@@ -315,8 +316,8 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
               background: file ? 'rgba(0,196,104,0.04)' : 'transparent',
               transition:'all 0.2s',
             }}
-              onMouseEnter={e => { if (!file) e.currentTarget.style.borderColor = '#243347' }}
-              onMouseLeave={e => { if (!file) e.currentTarget.style.borderColor = '#1a2535' }}
+              onMouseEnter={evt => { if (!file) evt.currentTarget.style.borderColor = '#243347' }}
+              onMouseLeave={evt => { if (!file) evt.currentTarget.style.borderColor = '#1a2535' }}
             >
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
                 stroke={file ? '#00c468' : '#3d5268'} strokeWidth="1.5">
@@ -339,10 +340,9 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
                 </div>
               )}
               <input type="file" accept=".csv" style={{ display:'none' }}
-                onChange={e => { setFile(e.target.files[0]); setError('') }} />
+                onChange={evt => { setFile(evt.target.files[0]); setError('') }} />
             </label>
 
-            {/* Erreur */}
             {error && (
               <div style={{
                 fontSize:10, color:'#FF4B6E',
@@ -357,7 +357,6 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
               </div>
             )}
 
-            {/* Boutons */}
             <div style={{ display:'flex', gap:8 }}>
               <button onClick={onClose} style={{
                 flex:1, padding:'10px 0', background:'none',
@@ -399,9 +398,7 @@ export default function Dashboard() {
   const [competitions, setCompetitions] = useState([])
   const [loading, setLoading]           = useState(true)
   const [isMobile, setIsMobile]         = useState(window.innerWidth < 768)
-
-  // ── Modal soumission ──
-  const [submitTarget, setSubmitTarget] = useState(null) // competition object
+  const [submitTarget, setSubmitTarget] = useState(null)
 
   useEffect(() => {
     const handle = () => setIsMobile(window.innerWidth < 768)
@@ -435,17 +432,17 @@ export default function Dashboard() {
   }
 
   const fetchLeaders = async () => {
-  const [{ data }, { count }] = await Promise.all([
-    supabase.from('profiles')
-      .select('id, full_name, total_points')
-      .order('total_points', { ascending: false }).limit(8),
-    supabase.from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .gt('total_points', profile?.total_points || 0),
-  ])
-  setLeaders(data || [])
-  setMyRank((count || 0) + 1)
-}
+    const [{ data }, { count }] = await Promise.all([
+      supabase.from('profiles')
+        .select('id, full_name, total_points')
+        .order('total_points', { ascending: false }).limit(5),
+      supabase.from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gt('total_points', profile?.total_points || 0),
+    ])
+    setLeaders(data || [])
+    setMyRank((count || 0) + 1)
+  }
 
   const fetchActivities = async () => {
     const { data } = await supabase.from('activities')
@@ -468,7 +465,6 @@ export default function Dashboard() {
     return () => supabase.removeChannel(ch)
   }, [])
 
-  // Calculs dérivés
   const myPoints = profile?.total_points || 0
   const maxPts   = leaders[0]?.total_points || 1
   const pending  = assignments.filter(a => !a.submitted && urgencyOf(a.deadline, false) !== 'expired').length
@@ -477,14 +473,15 @@ export default function Dashboard() {
   const firstName = profile?.full_name?.split(' ')[0] || 'Étudiant'
   const lastName  = profile?.full_name?.split(' ').slice(1).join(' ') || ''
 
+  // Est-ce que l'utilisateur est dans le top 5 ?
+  const meInTop = leaders.some(l => l.id === profile?.id)
+
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center',
       height:'60vh', flexDirection:'column', gap:16 }}>
       <div style={{ width:32, height:32, border:'2px solid #1a2535',
         borderTop:'2px solid #00FF87', borderRadius:'50%', animation:'spin 0.8s linear infinite' }}/>
-      <div style={{ fontSize:10, color:'#3d5268', letterSpacing:'0.15em' }}>
-        CHARGEMENT...
-      </div>
+      <div style={{ fontSize:10, color:'#3d5268', letterSpacing:'0.15em' }}>CHARGEMENT...</div>
       <style>{`@keyframes spin { to { transform:rotate(360deg) } }`}</style>
     </div>
   )
@@ -598,10 +595,6 @@ export default function Dashboard() {
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
               <SectionTitle>Activités récentes</SectionTitle>
-              <button style={{ fontSize:10, color:'#3d5268', background:'none', border:'none',
-                cursor:'pointer', fontFamily:"'IBM Plex Mono',monospace" }}>
-                Tout voir →
-              </button>
             </div>
             <Card>
               {activities.length === 0
@@ -624,7 +617,7 @@ export default function Dashboard() {
         {/* DROITE */}
         <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
-          {/* Leaderboard */}
+          {/* Leaderboard — hauteur fixe avec scroll interne */}
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
               <SectionTitle>Leaderboard</SectionTitle>
@@ -637,20 +630,60 @@ export default function Dashboard() {
                 LIVE
               </div>
             </div>
+
             {leaders.length === 0
               ? <Card><div style={{ textAlign:'center', color:'#3d5268', fontSize:11, padding:'20px 0' }}>
                   Aucun classement disponible
                 </div></Card>
-              : <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
-                  {leaders.map((l, i) => (
-                    <LeaderRow key={l.id} rank={i+1} name={l.full_name}
-                      points={l.total_points} isMe={l.id === profile?.id} maxPoints={maxPts} />
-                  ))}
+              : <div style={{
+                  background:'#0a1018', border:'1px solid #1a2535', borderRadius:10,
+                  overflow:'hidden',
+                }}>
+                  {/* Top 5 avec scroll interne */}
+                  <div style={{
+                    maxHeight: 260,
+                    overflowY:'auto',
+                    padding:'8px 8px 0',
+                    scrollbarWidth:'thin',
+                    scrollbarColor:'#1a2535 transparent',
+                  }}>
+                    <div style={{ display:'flex', flexDirection:'column', gap:4, paddingBottom:8 }}>
+                      {leaders.map((l, i) => (
+                        <LeaderRow key={l.id} rank={i+1} name={l.full_name}
+                          points={l.total_points} isMe={l.id === profile?.id} maxPoints={maxPts} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Ma position si je ne suis pas dans le top */}
+                  {!meInTop && myRank && (
+                    <>
+                      <div style={{
+                        display:'flex', alignItems:'center', gap:8, padding:'4px 16px',
+                        borderTop:'1px solid #1a2535',
+                      }}>
+                        <div style={{ flex:1, height:1, background:'#1a2535' }}/>
+                        <span style={{ fontSize:8, color:'#3d5268', letterSpacing:'0.1em' }}>
+                          ···
+                        </span>
+                        <div style={{ flex:1, height:1, background:'#1a2535' }}/>
+                      </div>
+                      <div style={{ padding:'0 8px 8px' }}>
+                        <LeaderRow
+                          rank={myRank}
+                          name={profile?.full_name || ''}
+                          points={myPoints}
+                          isMe={true}
+                          maxPoints={maxPts}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
             }
           </div>
 
-          {/* Compétitions */}
+          {/* Compétitions actives */}
           <div>
             <div style={{ marginBottom:12 }}><SectionTitle>Compétitions actives</SectionTitle></div>
             {competitions.length === 0
@@ -699,8 +732,8 @@ export default function Dashboard() {
                             border:'none', borderRadius:6, cursor:'pointer',
                             fontFamily:"'IBM Plex Mono',monospace", fontSize:10, fontWeight:600,
                             letterSpacing:'0.08em', display:'inline-flex', alignItems:'center', gap:6 }}
-                          onMouseEnter={e => e.currentTarget.style.boxShadow='0 0 16px rgba(0,255,135,0.3)'}
-                          onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
+                          onMouseEnter={evt => evt.currentTarget.style.boxShadow='0 0 16px rgba(0,255,135,0.3)'}
+                          onMouseLeave={evt => evt.currentTarget.style.boxShadow='none'}>
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="22" y1="2" x2="11" y2="13"/>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
