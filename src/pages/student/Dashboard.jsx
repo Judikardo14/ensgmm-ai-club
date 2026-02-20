@@ -683,71 +683,114 @@ export default function Dashboard() {
             }
           </div>
 
-          {/* Compétitions actives */}
-          <div>
-            <div style={{ marginBottom:12 }}><SectionTitle>Compétitions actives</SectionTitle></div>
-            {competitions.length === 0
-              ? <Card><div style={{ textAlign:'center', color:'#3d5268', fontSize:11, padding:'20px 0' }}>
-                  Aucune compétition active
-                </div></Card>
-              : competitions.map(c => {
-                  const elapsed = Math.min(100, Math.round(
-                    ((new Date() - new Date(c.start_date)) / (new Date(c.end_date) - new Date(c.start_date))) * 100
-                  ))
-                  return (
-                    <Card key={c.id} style={{ padding:0, overflow:'hidden', marginBottom:10 }}>
-                      <div style={{ height:56, position:'relative',
-                        background:'linear-gradient(135deg,#0a2040,#0f3060,#0a1a30)',
-                        display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        <div style={{ position:'absolute', inset:0,
-                          backgroundImage:'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)',
-                          backgroundSize:'20px 20px' }}/>
-                        <span style={{ position:'relative', zIndex:1, fontSize:9, letterSpacing:'0.2em',
-                          color:'rgba(255,255,255,0.3)', fontFamily:"'Unbounded',sans-serif",
-                          textTransform:'uppercase' }}>{c.scoring_type}</span>
-                        <div style={{ position:'absolute', top:8, right:8, width:7, height:7,
-                          borderRadius:'50%', background:'#00FF87', boxShadow:'0 0 8px #00FF87',
-                          animation:'pulse 1.5s infinite' }}/>
-                      </div>
-                      <div style={{ padding:'12px 14px' }}>
-                        <div style={{ fontSize:12, color:'#dce8f5', marginBottom:8 }}>{c.title}</div>
-                        <div style={{ display:'flex', justifyContent:'space-between',
-                          fontSize:10, color:'#3d5268', marginBottom:10 }}>
-                          <span>En cours</span>
-                          <CountdownTimer deadline={c.end_date} size="sm" />
-                        </div>
-                        <div style={{ marginBottom:12 }}>
-                          <div style={{ display:'flex', justifyContent:'space-between',
-                            fontSize:9, color:'#3d5268', marginBottom:4 }}>
-                            <span>TEMPS ÉCOULÉ</span><span>{elapsed}%</span>
-                          </div>
-                          <div style={{ height:3, background:'#1a2535', borderRadius:2, overflow:'hidden' }}>
-                            <div style={{ height:'100%', width:`${elapsed}%`,
-                              background:'linear-gradient(90deg,#00c468,#00FF87)' }}/>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setSubmitTarget(c)}
-                          style={{ padding:'7px 14px', background:'#00FF87', color:'#030507',
-                            border:'none', borderRadius:6, cursor:'pointer',
-                            fontFamily:"'IBM Plex Mono',monospace", fontSize:10, fontWeight:600,
-                            letterSpacing:'0.08em', display:'inline-flex', alignItems:'center', gap:6 }}
-                          onMouseEnter={evt => evt.currentTarget.style.boxShadow='0 0 16px rgba(0,255,135,0.3)'}
-                          onMouseLeave={evt => evt.currentTarget.style.boxShadow='none'}>
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="22" y1="2" x2="11" y2="13"/>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                          </svg>
-                          SOUMETTRE
-                        </button>
-                      </div>
-                    </Card>
-                  )
-                })
-            }
-          </div>
+          {/* Compétitions actives — Carousel */}
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <SectionTitle>Compétitions actives</SectionTitle>
+          <span style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.08em' }}>
+            {activeComps.length} compétition{activeComps.length !== 1 ? 's' : ''}
+          </span>
         </div>
+      
+        {activeComps.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 11, color: 'var(--text3)' }}>
+            Aucune compétition active.
+          </div>
+        ) : (
+          <>
+            {/* Scroll container */}
+            <div style={{
+              display: 'flex', gap: 12, overflowX: 'auto', scrollSnapType: 'x mandatory',
+              paddingBottom: 12, scrollbarWidth: 'none', msOverflowStyle: 'none',
+            }}
+              className="comp-carousel"
+            >
+              {activeComps.map(comp => {
+                const progress = timeProgress(comp.start_date, comp.end_date)
+                const urgentColor = progress > 80 ? '#FF4B6E' : progress > 60 ? '#FFB830' : '#00FF87'
+                return (
+                  <div key={comp.id} style={{
+                    minWidth: 220, maxWidth: 220, scrollSnapAlign: 'start',
+                    background: 'var(--bg2)', border: '1px solid var(--border)',
+                    borderRadius: 10, overflow: 'hidden', flexShrink: 0,
+                    transition: 'border-color 0.2s, transform 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = urgentColor; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)' }}
+                  >
+                    {/* Mini banner */}
+                    <div style={{
+                      height: 40, background: 'linear-gradient(135deg, #0a2040, #0f3060)',
+                      position: 'relative', overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)',
+                        backgroundSize: '16px 16px',
+                      }}/>
+                      <div style={{
+                        position: 'absolute', top: 8, right: 8,
+                        width: 6, height: 6, borderRadius: '50%',
+                        background: '#00FF87', boxShadow: '0 0 8px #00FF87',
+                        animation: 'pulse 1.5s infinite',
+                      }}/>
+                    </div>
+      
+                    <div style={{ padding: '12px 14px' }}>
+                      {/* Titre */}
+                      <div style={{
+                        fontSize: 11, color: 'var(--text)', letterSpacing: '0.02em',
+                        marginBottom: 8, lineHeight: 1.4,
+                        overflow: 'hidden', textOverflow: 'ellipsis',
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                      }}>
+                        {comp.title}
+                      </div>
+      
+                      {/* Progress bar */}
+                      <div style={{ marginBottom: 8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: 'var(--text3)', marginBottom: 4 }}>
+                          <span>Temps écoulé</span>
+                          <span style={{ color: urgentColor }}>{progress}%</span>
+                        </div>
+                        <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%', width: `${progress}%`,
+                            background: `linear-gradient(90deg, ${urgentColor}99, ${urgentColor})`,
+                            transition: 'width 1s ease',
+                          }}/>
+                        </div>
+                      </div>
+      
+                      {/* Participants */}
+                      <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.04em' }}>
+                        {comp.participant_count || 0} participants
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+      
+            {/* Indicateurs dots */}
+            {activeComps.length > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 4 }}>
+                {activeComps.map((_, i) => (
+                  <div key={i} style={{
+                    width: i === 0 ? 16 : 6, height: 6, borderRadius: 3,
+                    background: i === 0 ? '#00FF87' : 'var(--border)',
+                    transition: 'all 0.3s',
+                  }}/>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
+
+    <style>{`
+      .comp-carousel::-webkit-scrollbar { display: none; }
+    `}</style>
 
       {/* ── Modal soumission ── */}
       {submitTarget && (
