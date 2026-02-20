@@ -683,7 +683,7 @@ export default function Dashboard() {
             }
           </div>
 
-          {/* Compétitions actives — Carousel */}
+         {/* Compétitions actives — Carousel */}
           <div style={{ background: '#0a1018', border: '1px solid #1a2535', borderRadius: 10, padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <SectionTitle>Compétitions actives</SectionTitle>
@@ -698,74 +698,89 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                <div className="comp-carousel" style={{
-                  display: 'flex', gap: 12, overflowX: 'auto',
-                  scrollSnapType: 'x mandatory', paddingBottom: 8,
-                  scrollbarWidth: 'none',
-                }}>
-                  {competitions.map(comp => {
-                    const now = new Date()
-                    const total = new Date(comp.end_date) - new Date(comp.start_date)
-                    const elapsed = now - new Date(comp.start_date)
-                    const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)))
-                    const urgentColor = progress > 80 ? '#FF4B6E' : progress > 60 ? '#FFB830' : '#00FF87'
+                {/* Wrapper avec overflow caché */}
+                <div style={{ overflow: 'hidden', margin: '0 -16px', padding: '0 16px' }}>
+                  <div className="comp-carousel" style={{
+                    display: 'flex',
+                    flexDirection: 'row', // ← forcer horizontal
+                    gap: 12,
+                    overflowX: 'auto',
+                    overflowY: 'hidden',
+                    scrollSnapType: 'x mandatory',
+                    paddingBottom: 8,
+                    scrollbarWidth: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                  }}>
+                    {competitions.map(comp => {
+                      const now = new Date()
+                      const total = new Date(comp.end_date) - new Date(comp.start_date)
+                      const elapsed = now - new Date(comp.start_date)
+                      const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)))
+                      const urgentColor = progress > 80 ? '#FF4B6E' : progress > 60 ? '#FFB830' : '#00FF87'
           
-                    return (
-                      <div key={comp.id} style={{
-                        minWidth: 200, maxWidth: 200, scrollSnapAlign: 'start',
-                        background: '#060a0f', border: '1px solid #1a2535',
-                        borderRadius: 10, overflow: 'hidden', flexShrink: 0,
-                        transition: 'border-color 0.2s, transform 0.2s', cursor: 'pointer',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = urgentColor; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#1a2535'; e.currentTarget.style.transform = 'translateY(0)' }}
-                      >
-                        <div style={{
-                          height: 36, background: 'linear-gradient(135deg, #0a2040, #0f3060)',
-                          position: 'relative', overflow: 'hidden',
-                        }}>
+                      return (
+                        <div key={comp.id} style={{
+                          minWidth: 180,
+                          width: 180,
+                          flexShrink: 0, // ← empêche la compression
+                          scrollSnapAlign: 'start',
+                          background: '#060a0f',
+                          border: '1px solid #1a2535',
+                          borderRadius: 10,
+                          overflow: 'hidden',
+                          transition: 'border-color 0.2s, transform 0.2s',
+                          cursor: 'pointer',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = urgentColor; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = '#1a2535'; e.currentTarget.style.transform = 'translateY(0)' }}
+                        >
                           <div style={{
-                            position: 'absolute', inset: 0,
-                            backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)',
-                            backgroundSize: '14px 14px',
-                          }}/>
-                          <div style={{
-                            position: 'absolute', top: 8, right: 8,
-                            width: 5, height: 5, borderRadius: '50%',
-                            background: '#00FF87', boxShadow: '0 0 6px #00FF87',
-                            animation: 'pulse 1.5s infinite',
-                          }}/>
-                        </div>
-          
-                        <div style={{ padding: '10px 12px' }}>
-                          <div style={{
-                            fontSize: 10, color: '#dce8f5', marginBottom: 8, lineHeight: 1.4,
-                            overflow: 'hidden', textOverflow: 'ellipsis',
-                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                            height: 36, background: 'linear-gradient(135deg, #0a2040, #0f3060)',
+                            position: 'relative', overflow: 'hidden',
                           }}>
-                            {comp.title}
+                            <div style={{
+                              position: 'absolute', inset: 0,
+                              backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)',
+                              backgroundSize: '14px 14px',
+                            }}/>
+                            <div style={{
+                              position: 'absolute', top: 8, right: 8,
+                              width: 5, height: 5, borderRadius: '50%',
+                              background: '#00FF87', boxShadow: '0 0 6px #00FF87',
+                              animation: 'pulse 1.5s infinite',
+                            }}/>
                           </div>
           
-                          <div style={{ marginBottom: 6 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#3d5268', marginBottom: 3 }}>
-                              <span>Temps écoulé</span>
-                              <span style={{ color: urgentColor }}>{progress}%</span>
+                          <div style={{ padding: '10px 12px' }}>
+                            <div style={{
+                              fontSize: 10, color: '#dce8f5', marginBottom: 8, lineHeight: 1.4,
+                              overflow: 'hidden', textOverflow: 'ellipsis',
+                              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                            }}>
+                              {comp.title}
                             </div>
-                            <div style={{ height: 2, background: '#1a2535', borderRadius: 2, overflow: 'hidden' }}>
-                              <div style={{
-                                height: '100%', width: `${progress}%`,
-                                background: `linear-gradient(90deg, ${urgentColor}88, ${urgentColor})`,
-                              }}/>
-                            </div>
-                          </div>
           
-                          <div style={{ fontSize: 8, color: '#3d5268' }}>
-                            {comp.participant_count || 0} participants
+                            <div style={{ marginBottom: 6 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#3d5268', marginBottom: 3 }}>
+                                <span>Temps écoulé</span>
+                                <span style={{ color: urgentColor }}>{progress}%</span>
+                              </div>
+                              <div style={{ height: 2, background: '#1a2535', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{
+                                  height: '100%', width: `${progress}%`,
+                                  background: `linear-gradient(90deg, ${urgentColor}88, ${urgentColor})`,
+                                }}/>
+                              </div>
+                            </div>
+          
+                            <div style={{ fontSize: 8, color: '#3d5268' }}>
+                              {comp.participant_count || 0} participants
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
                 </div>
           
                 {competitions.length > 1 && (
