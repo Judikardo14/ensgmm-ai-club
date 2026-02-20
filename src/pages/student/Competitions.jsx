@@ -124,13 +124,23 @@ function CompModal({ comp, entry, onClose, onAction }) {
         const { data: urlData } = supabase.storage.from('competitions').getPublicUrl(path)
         fileUrl = urlData.publicUrl
       }
+  
+      // Upsert au lieu de update — crée la ligne si elle n'existe pas
       const { error: submitErr } = await supabase
         .from('competition_entries')
-        .update({ file_url: fileUrl, notes: note || null, submitted_at: new Date().toISOString() })
-        .eq('competition_id', comp.id).eq('user_id', user.id)
+        .upsert({
+          competition_id: comp.id,
+          user_id: user.id,
+          file_url: fileUrl,
+          notes: note || null,
+          submitted_at: new Date().toISOString(),
+        }, { onConflict: 'competition_id,user_id' })
+  
       if (submitErr) throw submitErr
       onAction()
-    } catch (err) { setError(err.message) }
+    } catch (err) {
+      setError(err.message)
+    }
     setLoading(false)
   }
 
