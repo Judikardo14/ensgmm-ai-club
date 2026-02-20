@@ -310,12 +310,12 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
                 <div style={{ textAlign:'center', padding:'20px 0', fontSize:11, color:'var(--text3)', letterSpacing:'0.06em' }}>
                   Aucun score publié pour l'instant.
                 </div>
-              ) : leaderboard.map((entry, i) => (
+              ) : leaderboard.map((lb, i) => (
                 <div key={i} style={{
                   display:'flex', alignItems:'center', gap:10,
                   padding:'9px 12px', borderRadius:8,
-                  background: i===0 ? 'rgba(0,255,135,0.04)' : entry.user_id === user?.id ? 'rgba(44,123,229,0.05)' : 'var(--bg2)',
-                  border: i===0 ? '1px solid rgba(0,255,135,0.15)' : entry.user_id === user?.id ? '1px solid rgba(44,123,229,0.15)' : '1px solid var(--border)',
+                  background: i===0 ? 'rgba(0,255,135,0.04)' : lb.user_id === user?.id ? 'rgba(44,123,229,0.05)' : 'var(--bg2)',
+                  border: i===0 ? '1px solid rgba(0,255,135,0.15)' : lb.user_id === user?.id ? '1px solid rgba(44,123,229,0.15)' : '1px solid var(--border)',
                 }}>
                   <span style={{
                     fontFamily:"'Unbounded',sans-serif", fontSize:11, fontWeight:700, width:20, textAlign:'center',
@@ -327,16 +327,16 @@ function CompModal({ comp, entry, onClose, onAction, profile }) {
                     display:'flex', alignItems:'center', justifyContent:'center',
                     fontSize:9, fontWeight:700, color:'#030507', fontFamily:"'Unbounded',sans-serif",
                   }}>
-                    {initials(entry.profiles?.full_name || '?')}
+                    {initials(lb.profiles?.full_name || '?')}
                   </div>
-                  <span style={{ flex:1, fontSize:11, color: entry.user_id === user?.id ? '#2C7BE5' : 'var(--text)', letterSpacing:'0.02em' }}>
-                    {entry.profiles?.full_name || 'Inconnu'}
-                    {entry.user_id === user?.id && (
+                  <span style={{ flex:1, fontSize:11, color: lb.user_id === user?.id ? '#2C7BE5' : 'var(--text)', letterSpacing:'0.02em' }}>
+                    {lb.profiles?.full_name || 'Inconnu'}
+                    {lb.user_id === user?.id && (
                       <span style={{ marginLeft:6, fontSize:8, color:'#2C7BE5', background:'rgba(44,123,229,0.15)', padding:'1px 5px', borderRadius:3 }}>VOUS</span>
                     )}
                   </span>
-                  <span style={{ fontSize:12, fontWeight:600, color: i===0 ? '#00FF87' : entry.user_id === user?.id ? '#2C7BE5' : 'var(--text2)' }}>
-                    {entry.score}
+                  <span style={{ fontSize:12, fontWeight:600, color: i===0 ? '#00FF87' : lb.user_id === user?.id ? '#2C7BE5' : 'var(--text2)' }}>
+                    {lb.score}
                   </span>
                 </div>
               ))}
