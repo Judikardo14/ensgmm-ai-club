@@ -385,6 +385,73 @@ function SubmitModal({ competition, profile, onClose, onSuccess }) {
   )
 }
 
+function CompCarousel({ competitions }) {
+  const [idx, setIdx] = useState(0)
+
+  if (competitions.length === 0) return (
+    <div style={{ background: '#0a1018', border: '1px solid #1a2535', borderRadius: 10, padding: 16 }}>
+      <SectionTitle>Compétitions actives</SectionTitle>
+      <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 11, color: '#3d5268' }}>
+        Aucune compétition active.
+      </div>
+    </div>
+  )
+
+  const comp = competitions[Math.min(idx, competitions.length - 1)]
+  const now = new Date()
+  const total = new Date(comp.end_date) - new Date(comp.start_date)
+  const elapsed = now - new Date(comp.start_date)
+  const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)))
+  const urgentColor = progress > 80 ? '#FF4B6E' : progress > 60 ? '#FFB830' : '#00FF87'
+
+  return (
+    <div style={{ background: '#0a1018', border: '1px solid #1a2535', borderRadius: 10, padding: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <SectionTitle>Compétitions actives</SectionTitle>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0}
+            style={{ background: 'none', border: '1px solid #1a2535', borderRadius: 4, width: 22, height: 22, cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? '#1a2535' : '#6b849e', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            ‹
+          </button>
+          <span style={{ fontSize: 9, color: '#3d5268' }}>{idx + 1}/{competitions.length}</span>
+          <button onClick={() => setIdx(i => Math.min(competitions.length - 1, i + 1))} disabled={idx === competitions.length - 1}
+            style={{ background: 'none', border: '1px solid #1a2535', borderRadius: 4, width: 22, height: 22, cursor: idx === competitions.length - 1 ? 'not-allowed' : 'pointer', color: idx === competitions.length - 1 ? '#1a2535' : '#6b849e', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            ›
+          </button>
+        </div>
+      </div>
+
+      <div style={{ background: '#060a0f', border: `1px solid ${urgentColor}33`, borderRadius: 10, overflow: 'hidden', transition: 'border-color 0.3s' }}>
+        <div style={{ height: 36, background: 'linear-gradient(135deg, #0a2040, #0f3060)', position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)', backgroundSize: '14px 14px' }}/>
+          <div style={{ position: 'absolute', top: 8, right: 8, width: 5, height: 5, borderRadius: '50%', background: '#00FF87', boxShadow: '0 0 6px #00FF87', animation: 'pulse 1.5s infinite' }}/>
+        </div>
+        <div style={{ padding: '12px 14px' }}>
+          <div style={{ fontSize: 11, color: '#dce8f5', marginBottom: 10, lineHeight: 1.4 }}>{comp.title}</div>
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#3d5268', marginBottom: 3 }}>
+              <span>Temps écoulé</span>
+              <span style={{ color: urgentColor }}>{progress}%</span>
+            </div>
+            <div style={{ height: 2, background: '#1a2535', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${urgentColor}66, ${urgentColor})`, transition: 'width 1s ease' }}/>
+            </div>
+          </div>
+          <div style={{ fontSize: 9, color: '#3d5268' }}>{comp.participant_count || 0} participants</div>
+        </div>
+      </div>
+
+      {competitions.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
+          {competitions.map((_, i) => (
+            <div key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 14 : 5, height: 5, borderRadius: 3, background: i === idx ? '#00FF87' : '#1a2535', cursor: 'pointer', transition: 'all 0.3s' }}/>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ══════════════════════════════════
 // PAGE DASHBOARD
 // ══════════════════════════════════
@@ -688,72 +755,9 @@ export default function Dashboard() {
             }
           </div>
 
-         {/* Compétitions actives */}
-          {(() => {
-            const [idx, setIdx] = useState(0)
-            const comp = competitions[idx]
-            if (!comp) return null
-            const now = new Date()
-            const total = new Date(comp.end_date) - new Date(comp.start_date)
-            const elapsed = now - new Date(comp.start_date)
-            const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)))
-            const urgentColor = progress > 80 ? '#FF4B6E' : progress > 60 ? '#FFB830' : '#00FF87'
-          
-            return (
-              <div style={{ background: '#0a1018', border: '1px solid #1a2535', borderRadius: 10, padding: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <SectionTitle>Compétitions actives</SectionTitle>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0}
-                      style={{ background: 'none', border: '1px solid #1a2535', borderRadius: 4, width: 20, height: 20, cursor: idx === 0 ? 'not-allowed' : 'pointer', color: idx === 0 ? '#1a2535' : '#6b849e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>
-                      ‹
-                    </button>
-                    <span style={{ fontSize: 9, color: '#3d5268' }}>{idx + 1}/{competitions.length}</span>
-                    <button onClick={() => setIdx(i => Math.min(competitions.length - 1, i + 1))} disabled={idx === competitions.length - 1}
-                      style={{ background: 'none', border: '1px solid #1a2535', borderRadius: 4, width: 20, height: 20, cursor: idx === competitions.length - 1 ? 'not-allowed' : 'pointer', color: idx === competitions.length - 1 ? '#1a2535' : '#6b849e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>
-                      ›
-                    </button>
-                  </div>
-                </div>
-          
-                <div style={{ background: '#060a0f', border: `1px solid ${urgentColor}33`, borderRadius: 10, overflow: 'hidden', transition: 'all 0.3s' }}>
-                  <div style={{ height: 40, background: 'linear-gradient(135deg, #0a2040, #0f3060)', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)', backgroundSize: '14px 14px' }}/>
-                    <div style={{ position: 'absolute', top: 8, right: 8, width: 5, height: 5, borderRadius: '50%', background: '#00FF87', boxShadow: '0 0 6px #00FF87', animation: 'pulse 1.5s infinite' }}/>
-                  </div>
-          
-                  <div style={{ padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, color: '#dce8f5', marginBottom: 10, lineHeight: 1.4 }}>
-                      {comp.title}
-                    </div>
-          
-                    <div style={{ marginBottom: 8 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 8, color: '#3d5268', marginBottom: 3 }}>
-                        <span>Temps écoulé</span>
-                        <span style={{ color: urgentColor }}>{progress}%</span>
-                      </div>
-                      <div style={{ height: 2, background: '#1a2535', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${urgentColor}66, ${urgentColor})` }}/>
-                      </div>
-                    </div>
-          
-                    <div style={{ fontSize: 9, color: '#3d5268' }}>{comp.participant_count || 0} participants</div>
-                  </div>
-                </div>
-          
-                {/* Dots */}
-                {competitions.length > 1 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 10 }}>
-                    {competitions.map((_, i) => (
-                      <div key={i} onClick={() => setCompIdx(i)} style={{ width: i === compIdx ? 14 : 5, height: 5, borderRadius: 3, background: i === compIdx ? '#00FF87' : '#1a2535', cursor: 'pointer', transition: 'all 0.3s' }}/>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-
-        </div> {/* fin colonne droite */}
+        {/* Compétitions actives */}
+        <CompCarousel competitions={competitions} />
+      </div> {/* fin colonne droite */}
       </div> {/* fin grid principale */}
 
       {/* ── Modal soumission ── */}
