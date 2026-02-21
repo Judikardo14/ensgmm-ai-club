@@ -252,10 +252,10 @@ export default function Register() {
               <select style={styles.select} value={form.filiere} onChange={e => set('filiere', e.target.value)}>
                 <option value="">Choisir...</option>
                 <option value="GMM">GMM</option>
-                <option value="GI">Prépa</option>
-                <option value="GC">TP</option>
-                <option value="GE">GEP</option>
-                <option value="GP">Autre</option>
+                <option value="Prépa">Prépa</option>
+                <option value="TP">TP</option>
+                <option value="GEP">GEP</option>
+                <option value="Autre">Autre</option>
               </select>
             </div>
             <div style={styles.formGroup}>
