@@ -69,10 +69,20 @@ async function fetchProfile(userId, retries = 8) {
       .select('*')
       .eq('id', userId)
       .single()
-    if (data) return data
+    if (data) {
+      // Vérifier si banni
+      if (data.banned) {
+        await supabase.auth.signOut()
+        window.location.href = '/banned'
+        return null
+      }
+      return data
+    }
     const delay = 300 + i * 200
     await new Promise(r => setTimeout(r, delay))
   }
+  return null
+}
 
   const { data: userData } = await supabase.auth.getUser()
   const user = userData?.user
