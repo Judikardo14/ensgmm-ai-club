@@ -54,6 +54,23 @@ const AdminRoute = ({ children }) => {
   return profile?.role === 'admin' ? children : <Navigate to="/dashboard" replace />
 }
 
+//Bannissement 
+function BannedPage() {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: '#030507', flexDirection: 'column', gap: 16,
+    }}>
+      <div style={{ fontSize: 32, color: '#FF4B6E' }}>⊘</div>
+      <div style={{ fontFamily: "'Unbounded',sans-serif", fontSize: 16, color: '#dce8f5' }}>
+        Accès suspendu
+      </div>
+      <div style={{ fontSize: 11, color: '#3d5268', maxWidth: 300, textAlign: 'center', lineHeight: 1.6 }}>
+        Ton compte a été suspendu. Contacte un administrateur.
+      </div>
+    </div>
+  )
+}
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -64,6 +81,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
+        <Route path="/banned" element={<BannedPage />} />
+        
         {/* ── Public ── */}
         <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
