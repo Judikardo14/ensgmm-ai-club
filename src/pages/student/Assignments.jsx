@@ -300,10 +300,15 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
             </div>
             {assignment.description && (
               <div style={{
-                fontSize: 10, color: 'var(--text3)', lineHeight: 1.6,
+                marginTop: 10,
+                padding: '10px 14px',
+                background: 'rgba(44,123,229,0.05)',
+                border: '1px solid rgba(44,123,229,0.12)',
+                borderRadius: 8,
+                fontSize: 11,
+                color: 'var(--text2)',
+                lineHeight: 1.7,
                 letterSpacing: '0.02em',
-                overflow: 'hidden', textOverflow: 'ellipsis',
-                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
               }}>
                 {assignment.description}
               </div>
