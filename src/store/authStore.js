@@ -16,16 +16,13 @@ export const useAuthStore = create((set, get) => ({
     }
 
     let isFetchingProfile = false
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_OUT') {
           set({ user: null, profile: null, loading: false })
           return
         }
-
         if (event === 'SIGNED_IN' && session?.user) {
-          // Évite un double fetch si TOKEN_REFRESHED arrive en même temps
           if (isFetchingProfile) return
           isFetchingProfile = true
           const profile = await fetchProfile(session.user.id)
@@ -33,19 +30,14 @@ export const useAuthStore = create((set, get) => ({
           isFetchingProfile = false
           return
         }
-
         if (event === 'TOKEN_REFRESHED' && session?.user) {
-          // Ne touche pas au profil — juste mettre à jour le user
           set(state => ({ user: session.user, profile: state.profile, loading: false }))
           return
         }
-
         if (event === 'PASSWORD_RECOVERY') return
-
         set({ loading: false })
       }
     )
-
     set({ _subscription: subscription })
   },
 
@@ -70,7 +62,6 @@ async function fetchProfile(userId, retries = 8) {
       .eq('id', userId)
       .single()
     if (data) {
-      // Vérifier si banni
       if (data.banned) {
         await supabase.auth.signOut()
         window.location.href = '/banned'
@@ -82,25 +73,4 @@ async function fetchProfile(userId, retries = 8) {
     await new Promise(r => setTimeout(r, delay))
   }
   return null
-}
-
-  const { data: userData } = await supabase.auth.getUser()
-  const user = userData?.user
-  if (!user) return null
-
-  const fallbackProfile = {
-    id:           userId,
-    full_name:    user.user_metadata?.full_name || user.email?.split('@')[0] || 'Membre',
-    email:        user.email,
-    role:         'student',
-    total_points: 0,
-  }
-
-  const { data: created } = await supabase
-    .from('profiles')
-    .upsert(fallbackProfile)
-    .select()
-    .single()
-
-  return created || fallbackProfile
 }
