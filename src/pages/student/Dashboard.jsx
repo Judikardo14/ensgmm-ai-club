@@ -700,21 +700,21 @@ export default function Dashboard() {
                 </div></Card>
               : <div style={{
                   display:'flex', flexDirection:'column', gap:8,
-                  maxHeight: assignments.length > 3 ? 320 : 'none',
-                  overflowY: assignments.length > 3 ? 'auto' : 'visible',
+                  maxHeight: assignments.length > 2 ? 320 : 'none',
+                  overflowY: assignments.length > 2 ? 'auto' : 'visible',
                   scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
-                  paddingRight: assignments.length > 3 ? 4 : 0,
+                  paddingRight: assignments.length > 2 ? 4 : 0,
                 }}>
                   {assignments.map(a => <AssignmentCard key={a.id} item={a} isMobile={isMobile} />)}
                 </div>
             }
-            {assignments.length > 3 && (
+            {assignments.length > 2 && (
               <div style={{
                 textAlign:'center', fontSize:9, color:'#3d5268',
                 letterSpacing:'0.08em', marginTop:8,
                 animation:'pulse 2s infinite',
               }}>
-                ↓ {assignments.length - 3} de plus
+                ↓ {assignments.length - 2} de plus
               </div>
             )}
           </div>
