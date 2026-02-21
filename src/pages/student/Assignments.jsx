@@ -299,20 +299,24 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
               {assignment.title}
             </div>
             {assignment.description && (
-              <div style={{
-                marginTop: 10,
-                padding: '10px 14px',
-                background: 'rgba(44,123,229,0.05)',
-                border: '1px solid rgba(44,123,229,0.12)',
-                borderRadius: 8,
-                fontSize: 11,
-                color: 'var(--text2)',
-                lineHeight: 1.7,
-                letterSpacing: '0.02em',
-              }}>
-                {assignment.description}
-              </div>
-            )}
+                <div style={{
+                  marginTop: 10,
+                  padding: '10px 14px',
+                  background: 'rgba(44,123,229,0.05)',
+                  border: '1px solid rgba(44,123,229,0.12)',
+                  borderRadius: 8,
+                  fontSize: 11,
+                  color: 'var(--text2)',
+                  lineHeight: 1.7,
+                  letterSpacing: '0.02em',
+                  maxHeight: 80, // ← ~3 lignes
+                  overflowY: 'auto',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(44,123,229,0.2) transparent',
+                }}>
+                  {assignment.description}
+                </div>
+              )}
           </div>
           <button onClick={onClose} style={{
             background: 'none', border: '1px solid var(--border)',
