@@ -684,10 +684,15 @@ export default function Dashboard() {
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
               <SectionTitle>Devoirs & Projets</SectionTitle>
-              <button style={{ fontSize:10, color:'#3d5268', background:'none', border:'none',
-                cursor:'pointer', fontFamily:"'IBM Plex Mono',monospace" }}>
-                Voir tout →
-              </button>
+              <button
+              onClick={() => window.location.href = '/assignments'}
+              style={{ fontSize:10, color:'#3d5268', background:'none', border:'none',
+              cursor:'pointer', fontFamily:"'IBM Plex Mono',monospace", transition:'color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#00FF87'}
+              onMouseLeave={e => e.currentTarget.style.color = '#3d5268'}
+            >
+              Voir tout →
+            </button>
             </div>
             {assignments.length === 0
               ? <Card><div style={{ textAlign:'center', color:'#3d5268', fontSize:11, padding:'20px 0' }}>
