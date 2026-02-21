@@ -723,20 +723,37 @@ export default function Dashboard() {
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
               <SectionTitle>Activités récentes</SectionTitle>
             </div>
-            <Card>
+            <Card style={{ padding: 0 }}>
               {activities.length === 0
                 ? <div style={{ textAlign:'center', color:'#3d5268', fontSize:11, padding:'20px 0' }}>
                     Aucune activité récente
                   </div>
-                : activities.map((a, i) => (
-                    <ActivityItem key={a.id}
-                      color={activityColor(a.type)}
-                      title={a.title} desc={a.content || ''}
-                      time={timeAgo(a.created_at)}
-                      isLast={i === activities.length - 1}
-                    />
-                  ))
+                : <div style={{
+                    maxHeight: 240,
+                    overflowY: activities.length > 2 ? 'auto' : 'visible',
+                    scrollbarWidth: 'thin', scrollbarColor: '#1a2535 transparent',
+                    padding: '16px 20px',
+                  }}>
+                    {activities.map((a, i) => (
+                      <ActivityItem key={a.id}
+                        color={activityColor(a.type)}
+                        title={a.title} desc={a.content || ''}
+                        time={timeAgo(a.created_at)}
+                        isLast={i === activities.length - 1}
+                      />
+                    ))}
+                  </div>
               }
+              {activities.length > 2 && (
+                <div style={{
+                  textAlign:'center', fontSize:9, color:'#3d5268',
+                  letterSpacing:'0.08em', padding:'8px 0',
+                  borderTop: '1px solid #1a2535',
+                  animation:'pulse 2s infinite',
+                }}>
+                  ↓ {activities.length - 2} de plus
+                </div>
+              )}
             </Card>
           </div>
         </div>
