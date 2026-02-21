@@ -700,7 +700,7 @@ export default function Dashboard() {
                 </div></Card>
               : <div style={{
                   display:'flex', flexDirection:'column', gap:8,
-                  maxHeight: assignments.length > 2 ? 320 : 'none',
+                  maxHeight: assignments.length > 2 ? 240 : 'none',
                   overflowY: assignments.length > 2 ? 'auto' : 'visible',
                   scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
                   paddingRight: assignments.length > 2 ? 4 : 0,
