@@ -289,6 +289,10 @@ export default function ManageUsers() {
   await supabase.from('profiles')
     .update({ banned: true })
     .eq('id', user.id)
+  
+  await supabase.from('banned_emails')
+    .insert({ email: user.email.toLowerCase(), banned_by: myProfile?.id })
+  
   fetchAll()
   showToast(`⊘ ${user.full_name} banni.`)
 }
@@ -297,6 +301,11 @@ const handleUnban = async (user) => {
   await supabase.from('profiles')
     .update({ banned: false })
     .eq('id', user.id)
+  
+  await supabase.from('banned_emails')
+    .delete()
+    .eq('email', user.email.toLowerCase())
+  
   fetchAll()
   showToast(`✓ ${user.full_name} débanni.`)
 }
