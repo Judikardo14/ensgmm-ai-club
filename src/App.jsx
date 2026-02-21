@@ -98,3 +98,12 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
+console.log(
+  '%c ENSGMM AI CLUB ',
+  'background: #00FF87; color: #030507; font-family: monospace; font-size: 14px; font-weight: 900; padding: 4px 12px; border-radius: 4px;'
+)
+console.log(
+  '%c Built by Judicael Karol DOBOEVI · Febuary 2026 ',
+  'color: #3d5268; font-family: monospace; font-size: 10px; letter-spacing: 0.1em;'
+)
