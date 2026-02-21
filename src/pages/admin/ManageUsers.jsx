@@ -77,19 +77,6 @@ function UserModal({ profile: initialProfile, rank, onClose, onRoleChanged, onDe
     onRoleChanged(profile.id, newRole)
   }
 
-  const handleBan = async (user, reason) => {
-  await supabase.from('profiles')
-    .update({ banned: true, ban_reason: reason })
-    .eq('id', user.id)
-  fetchUsers()
-}
-
-const handleUnban = async (user) => {
-  await supabase.from('profiles')
-    .update({ banned: false, ban_reason: null })
-    .eq('id', user.id)
-  fetchUsers()
-}
   const handleDelete = async () => {
     setDeleting(true)
     setDeleteError('')
@@ -297,6 +284,22 @@ export default function ManageUsers() {
   useEffect(() => { fetchAll() }, [fetchAll])
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000) }
+
+  const handleBan = async (user) => {
+  await supabase.from('profiles')
+    .update({ banned: true })
+    .eq('id', user.id)
+  fetchAll()
+  showToast(`⊘ ${user.full_name} banni.`)
+}
+
+const handleUnban = async (user) => {
+  await supabase.from('profiles')
+    .update({ banned: false })
+    .eq('id', user.id)
+  fetchAll()
+  showToast(`✓ ${user.full_name} débanni.`)
+}
 
   const filtered = profiles.filter(p => {
     const matchSearch = p.full_name?.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase()) || p.filiere?.toLowerCase().includes(search.toLowerCase())
