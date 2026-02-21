@@ -77,6 +77,19 @@ function UserModal({ profile: initialProfile, rank, onClose, onRoleChanged, onDe
     onRoleChanged(profile.id, newRole)
   }
 
+  const handleBan = async (user, reason) => {
+  await supabase.from('profiles')
+    .update({ banned: true, ban_reason: reason })
+    .eq('id', user.id)
+  fetchUsers()
+}
+
+const handleUnban = async (user) => {
+  await supabase.from('profiles')
+    .update({ banned: false, ban_reason: null })
+    .eq('id', user.id)
+  fetchUsers()
+}
   const handleDelete = async () => {
     setDeleting(true)
     setDeleteError('')
