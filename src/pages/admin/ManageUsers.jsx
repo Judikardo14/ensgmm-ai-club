@@ -270,6 +270,7 @@ export default function ManageUsers() {
   const [filter, setFilter]     = useState('Tous')
   const [selected, setSelected] = useState(null)
   const [toast, setToast]       = useState(null)
+  const [banTarget, setBanTarget] = useState(null) // { user, reason }
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
@@ -285,14 +286,12 @@ export default function ManageUsers() {
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000) }
 
-  const handleBan = async (user) => {
+  const handleBan = async (user, reason = '') => {
   await supabase.from('profiles')
-    .update({ banned: true })
+    .update({ banned: true, ban_reason: reason || null })
     .eq('id', user.id)
-  
   await supabase.from('banned_emails')
-    .insert({ email: user.email.toLowerCase(), banned_by: myProfile?.id })
-  
+    .insert({ email: user.email.toLowerCase(), reason: reason || null, banned_by: myProfile?.id })
   fetchAll()
   showToast(`⊘ ${user.full_name} banni.`)
 }
@@ -430,24 +429,21 @@ const handleUnban = async (user) => {
                   </div>
 
                   {/* Ban / Unban */}
-              {p.role !== 'admin' && (
-                <button
-                  onClick={e => { e.stopPropagation(); p.banned ? handleUnban(p) : handleBan(p) }}
-                  style={{
-                    padding: '4px 10px', borderRadius: 6, fontSize: 9, cursor: 'pointer',
-                    fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em',
-                    border: p.banned ? '1px solid rgba(0,255,135,0.3)' : '1px solid rgba(255,75,110,0.2)',
-                    background: p.banned ? 'rgba(0,255,135,0.06)' : 'rgba(255,75,110,0.06)',
-                    color: p.banned ? '#00c468' : '#FF4B6E',
-                    transition: 'all 0.15s', flexShrink: 0,
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                >
-                  {p.banned ? 'DÉBANNIR' : 'BANNIR'}
-                </button>
-              )}
-
+                  {p.role !== 'admin' && (
+                    <button
+                      onClick={e => { e.stopPropagation(); p.banned ? handleUnban(p) : setBanTarget({ user: p, reason: '' }) }}
+                      style={{
+                        padding: '4px 10px', borderRadius: 6, fontSize: 9, cursor: 'pointer',
+                        fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em',
+                        border: p.banned ? '1px solid rgba(0,255,135,0.3)' : '1px solid rgba(255,75,110,0.2)',
+                        background: p.banned ? 'rgba(0,255,135,0.06)' : 'rgba(255,75,110,0.06)',
+                        color: p.banned ? '#00c468' : '#FF4B6E',
+                        transition: 'all 0.15s', flexShrink: 0,
+                      }}
+                    >
+                      {p.banned ? 'DÉBANNIR' : 'BANNIR'}
+                    </button>
+                  )}
                   {/* Points */}
                   <div style={{ fontSize: 13, fontWeight: 600, color: rank <= 3 ? ['#FFD700','#C0C0C0','#CD7F32'][rank-1] : 'var(--text2)', letterSpacing: '0.02em', flexShrink: 0 }}>
                     {p.total_points}
@@ -480,6 +476,37 @@ const handleUnban = async (user) => {
           }}
         />
       )}
+        {banTarget && (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1100, background: 'rgba(3,5,7,0.88)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+      onClick={e => e.target === e.currentTarget && setBanTarget(null)}>
+      <div style={{ background: 'var(--surface)', border: '1px solid rgba(255,75,110,0.3)', borderRadius: 14, width: '100%', maxWidth: 380, padding: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.7)' }}>
+        <div style={{ fontSize: 9, color: '#FF4B6E', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>Bannissement</div>
+        <div style={{ fontSize: 14, color: 'var(--text)', marginBottom: 16 }}>{banTarget.user.full_name}</div>
+  
+        <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.1em', marginBottom: 6 }}>RAISON</div>
+        <input
+          value={banTarget.reason}
+          onChange={e => setBanTarget(b => ({ ...b, reason: e.target.value }))}
+          placeholder="Violation des règles, spam…"
+          style={{ width: '100%', padding: '9px 12px', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)', fontSize: 11, fontFamily: "'IBM Plex Mono',monospace", outline: 'none', marginBottom: 16 }}
+          onFocus={e => e.target.style.borderColor = '#FF4B6E'}
+          onBlur={e => e.target.style.borderColor = 'var(--border)'}
+        />
+  
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => setBanTarget(null)} style={{ flex: 1, padding: '9px 0', background: 'none', border: '1px solid var(--border2)', borderRadius: 8, cursor: 'pointer', color: 'var(--text3)', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace" }}>
+            Annuler
+          </button>
+          <button onClick={async () => {
+            await handleBan(banTarget.user, banTarget.reason)
+            setBanTarget(null)
+          }} style={{ flex: 2, padding: '9px 0', background: '#FF4B6E', border: 'none', borderRadius: 8, cursor: 'pointer', color: '#fff', fontSize: 10, fontFamily: "'IBM Plex Mono',monospace", fontWeight: 700, letterSpacing: '0.08em' }}>
+            CONFIRMER LE BAN →
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
     </div>
   )
 }
