@@ -35,24 +35,29 @@ export default function Register() {
   const nextStep = async () => {
   setError('')
   if (step === 1) {
-    if (!form.firstName.trim() || !form.lastName.trim())
-      return setError('Prénom et nom requis.')
-    if (!form.email.trim() || !form.email.includes('@'))
-      return setError('Email invalide.')
-    if (!form.filiere.trim() || !form.promo)
-      return setError('Filière et promotion requises.')
+  if (!form.firstName.trim() || !form.lastName.trim())
+    return setError('Prénom et nom requis.')
+  if (!form.email.trim() || !form.email.includes('@'))
+    return setError('Email invalide.')
+  if (!form.filiere.trim() || !form.promo)
+    return setError('Filière et promotion requises.')
 
-    // Vérifier si l'email est banni
-    const { data: isBanned } = await supabase
-      .from('banned_emails')
-      .select('email')
-      .eq('email', form.email.trim().toLowerCase())
-      .single()
+  // Email banni ?
+  const { data: isBanned } = await supabase
+    .from('banned_emails')
+    .select('email')
+    .eq('email', form.email.trim().toLowerCase())
+    .single()
+  if (isBanned) return setError('Cette adresse email est bannie de la plateforme.')
 
-    if (isBanned) {
-      return setError('Cette adresse email est bannie de la plateforme.')
-    }
-  }
+  // Email déjà utilisé ?
+  const { data: existingUser } = await supabase
+    .from('profiles')
+    .select('email')
+    .eq('email', form.email.trim().toLowerCase())
+    .single()
+  if (existingUser) return setError('Un compte existe déjà avec cette adresse email.')
+}
   if (step === 2) {
     if (!form.password || form.password.length < 8)
       return setError('Mot de passe trop court (8 caractères min).')
