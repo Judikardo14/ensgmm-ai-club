@@ -291,13 +291,23 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
       }}>
         {/* Header */}
         <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: 20 }}>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9, color: 'var(--text3)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
               Soumettre un travail
             </div>
-            <div style={{ fontSize: 14, color: 'var(--text)', letterSpacing: '0.02em', lineHeight: 1.3 }}>
+            <div style={{ fontSize: 14, color: 'var(--text)', letterSpacing: '0.02em', lineHeight: 1.3, marginBottom: assignment.description ? 8 : 0 }}>
               {assignment.title}
             </div>
+            {assignment.description && (
+              <div style={{
+                fontSize: 10, color: 'var(--text3)', lineHeight: 1.6,
+                letterSpacing: '0.02em',
+                overflow: 'hidden', textOverflow: 'ellipsis',
+                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              }}>
+                {assignment.description}
+              </div>
+            )}
           </div>
           <button onClick={onClose} style={{
             background: 'none', border: '1px solid var(--border)',
