@@ -685,25 +685,39 @@ export default function Dashboard() {
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
               <SectionTitle>Devoirs & Projets</SectionTitle>
               <button
-              onClick={() => window.location.href = '/assignments'}
-              style={{ fontSize:10, color:'#3d5268', background:'none', border:'none',
-              cursor:'pointer', fontFamily:"'IBM Plex Mono',monospace", transition:'color 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#00FF87'}
-              onMouseLeave={e => e.currentTarget.style.color = '#3d5268'}
-            >
-              Voir tout →
-            </button>
+                onClick={() => window.location.href = '/assignments'}
+                style={{ fontSize:10, color:'#3d5268', background:'none', border:'none',
+                cursor:'pointer', fontFamily:"'IBM Plex Mono',monospace", transition:'color 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#00FF87'}
+                onMouseLeave={e => e.currentTarget.style.color = '#3d5268'}
+              >
+                Voir tout →
+              </button>
             </div>
             {assignments.length === 0
               ? <Card><div style={{ textAlign:'center', color:'#3d5268', fontSize:11, padding:'20px 0' }}>
                   Aucun devoir ouvert pour le moment
                 </div></Card>
-              : <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              : <div style={{
+                  display:'flex', flexDirection:'column', gap:8,
+                  maxHeight: assignments.length > 3 ? 320 : 'none',
+                  overflowY: assignments.length > 3 ? 'auto' : 'visible',
+                  scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
+                  paddingRight: assignments.length > 3 ? 4 : 0,
+                }}>
                   {assignments.map(a => <AssignmentCard key={a.id} item={a} isMobile={isMobile} />)}
                 </div>
             }
+            {assignments.length > 3 && (
+              <div style={{
+                textAlign:'center', fontSize:9, color:'#3d5268',
+                letterSpacing:'0.08em', marginTop:8,
+                animation:'pulse 2s infinite',
+              }}>
+                ↓ {assignments.length - 3} de plus
+              </div>
+            )}
           </div>
-
           {/* Activités */}
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
