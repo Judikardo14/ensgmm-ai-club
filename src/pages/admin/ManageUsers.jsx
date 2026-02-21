@@ -420,6 +420,25 @@ const handleUnban = async (user) => {
                     </div>
                   </div>
 
+                  {/* Ban / Unban */}
+              {p.role !== 'admin' && (
+                <button
+                  onClick={e => { e.stopPropagation(); p.banned ? handleUnban(p) : handleBan(p) }}
+                  style={{
+                    padding: '4px 10px', borderRadius: 6, fontSize: 9, cursor: 'pointer',
+                    fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.06em',
+                    border: p.banned ? '1px solid rgba(0,255,135,0.3)' : '1px solid rgba(255,75,110,0.2)',
+                    background: p.banned ? 'rgba(0,255,135,0.06)' : 'rgba(255,75,110,0.06)',
+                    color: p.banned ? '#00c468' : '#FF4B6E',
+                    transition: 'all 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  {p.banned ? 'DÉBANNIR' : 'BANNIR'}
+                </button>
+              )}
+
                   {/* Points */}
                   <div style={{ fontSize: 13, fontWeight: 600, color: rank <= 3 ? ['#FFD700','#C0C0C0','#CD7F32'][rank-1] : 'var(--text2)', letterSpacing: '0.02em', flexShrink: 0 }}>
                     {p.total_points}
