@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore'
 
 const NAV = [
@@ -35,6 +36,12 @@ export default function Sidebar() {
   const navigate  = useNavigate()
   const location  = useLocation()
   const { profile, logout } = useAuthStore()
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme')
+    if (saved) document.documentElement.setAttribute('data-theme', saved)
+  }, [])
+
 
   const initials = profile?.full_name
     ?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AI'
@@ -92,6 +99,32 @@ export default function Sidebar() {
           )
         })}
       </nav>
+
+      {/* Theme Toggle */}
+      <div style={{ padding: '8px 14px', borderTop: '1px solid var(--border)' }}>
+        <button onClick={() => {
+          const isDark = document.documentElement.getAttribute('data-theme') !== 'light'
+          document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark')
+          localStorage.setItem('theme', isDark ? 'light' : 'dark')
+        }} style={{
+          width: '100%', padding: '7px 10px',
+          background: 'none', border: '1px solid var(--border)',
+          borderRadius: 6, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 8,
+          color: 'var(--text3)', fontSize: 10,
+          fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
+          transition: 'all 0.2s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border2)'}
+        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+        >
+          <span style={{ fontSize: 12 }}>
+            {document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️'}
+          </span>
+          {document.documentElement.getAttribute('data-theme') === 'light' ? 'Mode sombre' : 'Mode clair'}
+        </button>
+      </div>
+      
 
       {/* User */}
       <div style={s.user}>
