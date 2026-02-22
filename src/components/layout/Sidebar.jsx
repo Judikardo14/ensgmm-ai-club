@@ -69,10 +69,10 @@ export default function Sidebar() {
             <line x1="12" y1="15" x2="4" y2="17"/><line x1="12" y1="15" x2="20" y2="17"/>
           </svg>
         </div>
-        <div style={{ flex: 1 }}>
-          <div style={s.brandName}>ENSGMM</div>
-          <div style={s.brandSub}>AI CLUB</div>
-        </div>
+        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <div style={s.brandName}>ENSGMM</div>
+        <div style={s.brandSub}>AI CLUB</div>
+      </div>
         <button onClick={() => {
           const next = !isDark
           setIsDark(next)
