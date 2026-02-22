@@ -143,7 +143,7 @@ const s = {
     top: 0, left: 0, bottom: 0, zIndex: 100,
   },
   brand: {
-    padding: '18px 16px', borderBottom: '1px solid var(--border)',
+    padding: '18px 12px 18px 16px', borderBottom: '1px solid var(--border)',
     display: 'flex', alignItems: 'center', gap: 10,
   },
   brandLogo: {
