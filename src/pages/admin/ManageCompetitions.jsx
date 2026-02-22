@@ -152,7 +152,16 @@ function SubmissionsModal({ competition, onClose }) {
     setLoading(false)
   }, [competition.id])
 
-  useEffect(() => { fetchEntries() }, [fetchEntries])
+  useEffect(() => {
+  fetchEntries()
+
+  const ch = supabase.channel('competitions-entries-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'competition_entries' }, () => fetchEntries())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'competitions' }, () => fetchEntries())
+    .subscribe()
+
+  return () => supabase.removeChannel(ch)
+}, [fetchEntries])
 
   const handleSaveScore = async (entryId) => {
     const val = parseFloat(scores[entryId])
