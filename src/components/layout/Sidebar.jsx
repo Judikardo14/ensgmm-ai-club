@@ -119,7 +119,7 @@ export default function Sidebar() {
         }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
           background: 'none', border: 'none', cursor: 'pointer',
           padding: 4, color: '#3d5268', display: 'flex', alignItems: 'center',
-          fontSize: 13, transition: 'all 0.2s',
+          fontSize: 13,flexShrink: 0, transition: 'all 0.2s',
         }}>
           {isDark ? '☀️' : '🌙'}
         </button>
@@ -174,8 +174,8 @@ const s = {
     color: '#030507', fontWeight: 600,
   },
   user: {
-    padding: '12px 14px', borderTop: '1px solid #1a2535',
-    display: 'flex', alignItems: 'center', gap: 10,
+  padding: '12px 14px', borderTop: '1px solid #1a2535',
+  display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden',
   },
   avatar: {
     width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
