@@ -209,8 +209,8 @@ export default function AdminDashboard() {
             ✓ Toutes les soumissions sont notées.
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {pending.map(sub => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 280, overflowY: pending.length > 2 ? 'auto' : 'visible', scrollbarWidth: 'thin', scrollbarColor: '#1a2535 transparent', paddingRight: pending.length > 2 ? 4 : 0 }}>
+              {pending.map(sub => (
               <div key={sub.id} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '11px 14px', background: 'var(--bg2)',
