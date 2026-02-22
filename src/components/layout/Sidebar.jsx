@@ -73,6 +73,18 @@ export default function Sidebar() {
           <div style={s.brandName}>ENSGMM</div>
           <div style={s.brandSub}>AI CLUB</div>
         </div>
+        <button onClick={() => {
+          const next = !isDark
+          setIsDark(next)
+          document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+          localStorage.setItem('theme', next ? 'dark' : 'light')
+        }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          padding: 4, color: '#3d5268', fontSize: 12,
+          display: 'flex', alignItems: 'center', flexShrink: 0,
+        }}>
+          {isDark ? '☀️' : '🌙'}
+        </button>
       </div>
 
       {/* Nav */}
@@ -111,18 +123,6 @@ export default function Sidebar() {
           <div style={s.userName}>{profile?.full_name || 'Utilisateur'}</div>
           <div style={s.userRole}>{profile?.role || 'member'}</div>
         </div>
-        <button onClick={() => {
-          const next = !isDark
-          setIsDark(next)
-          document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
-          localStorage.setItem('theme', next ? 'dark' : 'light')
-        }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          padding: 4, color: '#3d5268', display: 'flex', alignItems: 'center',
-          fontSize: 13,flexShrink: 0, transition: 'all 0.2s',
-        }}>
-          {isDark ? '☀️' : '🌙'}
-        </button>
         <button onClick={handleLogout} title="Déconnexion" style={s.logoutBtn}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="1.5">
