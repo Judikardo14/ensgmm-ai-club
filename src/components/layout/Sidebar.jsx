@@ -170,7 +170,7 @@ const s = {
     letterSpacing: '0.2em', color: '#6b849e', textTransform: 'uppercase',
   },
   brandSub: { fontSize: 7, letterSpacing: '0.15em', color: '#3d5268', textTransform: 'uppercase' },
-  nav: { flex: 1, padding: '12px 8px', overflowY: 'auto' },
+  nav: { flex: 1, padding: '12px 8px', overflowY: 'auto', minHeight: 0 },
   navLabel: {
     fontSize: 8, letterSpacing: '0.2em', color: '#3d5268',
     textTransform: 'uppercase', padding: '0 8px', marginBottom: 4,
