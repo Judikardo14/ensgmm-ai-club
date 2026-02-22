@@ -344,7 +344,16 @@ export default function ManageAssignments() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchAll() }, [fetchAll])
+  useEffect(() => {
+  fetchAll()
+
+  const ch = supabase.channel('manage-assignments-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments' }, () => fetchAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchAll())
+    .subscribe()
+
+  return () => supabase.removeChannel(ch)
+}, [fetchAll])
 
   const handleDelete = async (a) => {
     await supabase.from('submissions').delete().eq('assignment_id', a.id)
