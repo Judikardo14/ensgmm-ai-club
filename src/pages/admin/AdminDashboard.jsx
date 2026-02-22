@@ -208,9 +208,10 @@ export default function AdminDashboard() {
           <div style={{ textAlign: 'center', padding: '30px 0', fontSize: 11, color: 'var(--text3)', letterSpacing: '0.06em' }}>
             ✓ Toutes les soumissions sont notées.
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 280, overflowY: pending.length > 2 ? 'auto' : 'visible', scrollbarWidth: 'thin', scrollbarColor: '#1a2535 transparent', paddingRight: pending.length > 2 ? 4 : 0 }}>
-              {pending.map(sub => (
+       ) : (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 160, overflowY: pending.length > 2 ? 'auto' : 'visible', scrollbarWidth: 'thin', scrollbarColor: '#1a2535 transparent', paddingRight: pending.length > 2 ? 4 : 0 }}>
+            {pending.map(sub => (
               <div key={sub.id} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '11px 14px', background: 'var(--bg2)',
@@ -243,6 +244,12 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+          {pending.length > 2 && (
+            <div style={{ textAlign: 'center', fontSize: 9, color: '#3d5268', letterSpacing: '0.08em', marginTop: 8, animation: 'pulse 2s infinite' }}>
+              ↓ {pending.length - 2} de plus
+            </div>
+          )}
+        </>
         )}
       </div>
 
