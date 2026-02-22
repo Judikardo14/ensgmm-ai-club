@@ -600,15 +600,15 @@ export default function Competitions() {
   }, [user.id])
 
   useEffect(() => {
-  fetchAll()
+  fetchData()
 
   const ch = supabase.channel('competitions-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'competitions' }, () => fetchAll())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'competition_entries' }, () => fetchAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'competitions' }, () => fetchData())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'competition_entries' }, () => fetchData())
     .subscribe()
 
   return () => supabase.removeChannel(ch)
-}, [fetchAll])
+}, [fetchData])
 
   const filtered = competitions.filter(c => {
     const status = getStatus(c)
