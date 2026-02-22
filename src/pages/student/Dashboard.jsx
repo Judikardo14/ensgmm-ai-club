@@ -403,7 +403,20 @@ export default function Dashboard() {
     return () => window.removeEventListener('resize', handle)
   }, [])
 
-  useEffect(() => { if (profile?.id) fetchAll() }, [profile])
+  useEffect(() => {
+  if (profile?.id) {
+    fetchAll()
+
+    const ch = supabase.channel('dashboard-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchAll())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments' }, () => fetchAll())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'competitions' }, () => fetchAll())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'competition_entries' }, () => fetchAll())
+      .subscribe()
+
+    return () => supabase.removeChannel(ch)
+  }
+}, [profile])
 
   const fetchAll = async () => {
     setLoading(true)
