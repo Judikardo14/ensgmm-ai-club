@@ -195,6 +195,7 @@ function NavItem({ to, label, Icon, badge, onClick }) {
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 function SidebarContent({ profile, logout, onNavClick }) {
   const isAdmin = profile?.role === 'admin'
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') !== 'light')
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -209,6 +210,19 @@ function SidebarContent({ profile, logout, onNavClick }) {
         <div style={{ fontFamily: "'Unbounded',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#6b849e', textTransform: 'uppercase', lineHeight: 1.3 }}>
           ENSGMM<span style={{ display: 'block', color: '#00FF87', fontSize: 7, letterSpacing: '0.15em', marginTop: 2 }}>AI CLUB</span>
         </div>
+        {/* bouton thème — AJOUTER ICI */}
+      <button onClick={() => {
+        const next = !isDark
+        setIsDark(next)
+        document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+        localStorage.setItem('theme', next ? 'dark' : 'light')
+      }} style={{
+        background: 'none', border: 'none', cursor: 'pointer',
+        padding: 4, fontSize: 14, flexShrink: 0,
+        display: 'flex', alignItems: 'center',
+      }}>
+        {isDark ? '☀️' : '🌙'}
+      </button>
       </div>
       <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
         <div style={{ marginBottom: 20 }}>
