@@ -333,6 +333,7 @@ const handleUnban = async (user) => {
   return (
     <div style={{ padding: 'clamp(16px,4vw,28px)', maxWidth: 900, margin: '0 auto' }}>
       <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes slideIn { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
         .user-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -402,17 +403,26 @@ const handleUnban = async (user) => {
       </div>
 
       {/* Table */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, animation: 'fadeUp 0.35s 0.15s ease both' }}>
-        {loading
-          ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} style={{ height: 58, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, opacity: 0.5 - i * 0.07 }}/>
-            ))
-          : filtered.length === 0
-          ? <div style={{ textAlign: 'center', padding: '32px 0', fontSize: 11, color: 'var(--text3)', letterSpacing: '0.06em' }}>Aucun utilisateur trouvé.</div>
-          : filtered.map((p) => {
-              const rank = profiles.findIndex(pr => pr.id === p.id) + 1
-              return (
-                <div key={p.id} className="user-row" onClick={() => setSelected({ profile: p, rank })}>
+            <div style={{ animation: 'fadeUp 0.35s 0.15s ease both' }}>
+              {/* Badge +X si plus de 6 */}
+              {!loading && filtered.length > 6 && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+                  <span style={{
+                    fontSize: 9, padding: '3px 10px', borderRadius: 10,
+                    background: 'rgba(0,255,135,0.08)', border: '1px solid rgba(0,255,135,0.2)',
+                    color: '#00FF87', letterSpacing: '0.1em',
+                    animation: 'pulse 1.5s infinite',
+                  }}>
+                    +{filtered.length - 6} utilisateur{filtered.length - 6 > 1 ? 's' : ''}
+                  </span>
+                </div>
+              )}
+            <div style={{
+              maxHeight: filtered.length > 6 ? 420 : 'none',
+              overflowY: filtered.length > 6 ? 'auto' : 'visible',
+              display: 'flex', flexDirection: 'column', gap: 6,
+              scrollbarWidth: 'thin', scrollbarColor: '#1a2535 transparent',
+            }}>
                   {/* Rang */}
                   <div style={{ fontFamily: "'Unbounded',sans-serif", fontSize: 11, fontWeight: 700, width: 24, textAlign: 'center', color: rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'var(--text3)', flexShrink: 0 }}>
                     {rank}
@@ -462,6 +472,8 @@ const handleUnban = async (user) => {
             })
         }
       </div>
+ </div>    {/* fin scroll wrapper */}
+</div>      {/* fin animation wrapper */}
 
       {/* Modal */}
       {selected && (
