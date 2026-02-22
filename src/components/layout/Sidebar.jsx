@@ -58,34 +58,30 @@ export default function Sidebar() {
   return (
     <aside style={s.sidebar}>
       {/* Brand */}
-      <div style={s.brand}>
-        <div style={s.brandLogo}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="#00FF87" strokeWidth="1.5" strokeLinecap="round">
-            <circle cx="12" cy="12" r="3"/>
-            <circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
-            <circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/>
-            <line x1="12" y1="9" x2="4" y2="7"/><line x1="12" y1="9" x2="20" y2="7"/>
-            <line x1="12" y1="15" x2="4" y2="17"/><line x1="12" y1="15" x2="20" y2="17"/>
-          </svg>
-        </div>
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ ...s.brand, overflow: 'visible' }}>
+      <div style={s.brandLogo}>
+        {/* ton svg */}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={s.brandName}>ENSGMM</div>
         <div style={s.brandSub}>AI CLUB</div>
       </div>
-        <button onClick={() => {
-          const next = !isDark
-          setIsDark(next)
-          document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
-          localStorage.setItem('theme', next ? 'dark' : 'light')
-        }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          padding: 4, color: '#6b849e', fontSize: 14,
-          display: 'flex', alignItems: 'center', flexShrink: 0,
-        }}>
-          {isDark ? '☀️' : '🌙'}
-        </button>
-      </div>
+      <button onClick={() => {
+        const next = !isDark
+        setIsDark(next)
+        document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+        localStorage.setItem('theme', next ? 'dark' : 'light')
+      }} style={{
+        background: 'rgba(255,255,255,0.1)',
+        border: '1px solid red',  // ← temporaire pour débugger
+        cursor: 'pointer',
+        width: 28, height: 28,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0, fontSize: 14,
+      }}>
+        {isDark ? '☀️' : '🌙'}
+      </button>
+    </div>
       {/* Nav */}
       <nav style={s.nav}>
         <div style={s.navLabel}>PRINCIPAL</div>
