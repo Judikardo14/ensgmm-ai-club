@@ -30,25 +30,25 @@
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Mode clair nocturne — beige ambré chaud ────────────────────────────────── */
+/* ── Mode clair — noir & beige ──────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg:          #1c1612;   /* fond très sombre ambré */
-  --bg2:         #231c15;   /* légèrement plus clair */
-  --surface:     #2c2218;   /* surfaces chaudes */
-  --surface2:    #342820;   /* surfaces secondaires */
+  --bg:          #0f0e0b;   /* presque noir, légère teinte chaude */
+  --bg2:         #161410;   /* fond secondaire */
+  --surface:     #1e1b14;   /* surfaces — brun très sombre */
+  --surface2:    #252118;   /* surfaces secondaires */
 
-  --border:      #3d3025;
-  --border2:     #4e3c2e;
+  --border:      #2e2a1f;   /* bordures discrètes beige sombre */
+  --border2:     #3d3828;   /* bordures actives */
 
-  --accent:      #00d472;   /* vert légèrement adouci sur fond chaud */
+  --accent:      #00d472;
   --accent-dim:  #00b860;
   --blue:        #5ba3f5;
   --warn:        #FFB830;
   --danger:      #FF6B85;
 
-  --text:        #f5e6cc;   /* blanc cassé chaud — crème */
-  --text2:       #c4a882;   /* beige moyen */
-  --text3:       #7a6048;   /* beige foncé */
+  --text:        #e8dcc8;   /* beige clair principal — lisible et doux */
+  --text2:       #b5a080;   /* beige moyen */
+  --text3:       #6b5c42;   /* beige foncé — textes discrets */
 }
 
 /* ── Reset ─────────────────────────────────────────────────────────────────── */
