@@ -145,6 +145,7 @@ export default function AdminDashboard() {
       <style>{`
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes slideIn{ from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
         .admin-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
         @media(max-width:640px){ .admin-stats{ grid-template-columns:repeat(2,1fr); } }
         @media(max-width:360px){ .admin-stats{ grid-template-columns:1fr; } }
