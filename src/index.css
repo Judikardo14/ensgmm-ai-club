@@ -20,6 +20,18 @@
   --text3:       #4d6580;
 }
 
+[data-theme="light"] {
+  --bg:          #f0f4f8;
+  --bg2:         #e4eaf2;
+  --surface:     #ffffff;
+  --surface2:    #f8fafc;
+  --border:      #d0dae6;
+  --border2:     #b8c8d8;
+  --text:        #0a1520;
+  --text2:       #3d5268;
+  --text3:       #6b849e;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
