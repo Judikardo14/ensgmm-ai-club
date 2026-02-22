@@ -196,7 +196,7 @@ function SubmitModal({ assignment, existingSubmission, onClose, onSuccess }) {
         notes:         note.trim() || null,
         status:        asDraft ? 'draft' : 'submitted',
         is_draft:      asDraft,
-        submitted_at: asDraft ? (existingSubmission?.submitted_at || new Date().toISOString()) : new Date().toISOString(),
+        status: asDraft ? 'pending' : 'submitted',
       }, { onConflict: 'assignment_id,user_id' })
 
       if (dbErr) throw dbErr
