@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 :root {
-  /* ── Fonds — légèrement relevés pour casser le noir pur ── */
+  /* ── Fonds dark — légèrement relevés pour casser le noir pur ── */
   --bg:          #050a10;
   --bg2:         #080f17;
   --surface:     #0d1520;
@@ -21,26 +21,34 @@
   --warn:        #FFB830;
   --danger:      #FF4B6E;
 
-  /* ── Texte — contraste nettement amélioré ── */
+  /* ── Texte — contraste amélioré ── */
   --text:        #f0f7ff;
   --text2:       #9dbdd8;
   --text3:       #5e7d96;
 
-  /* ── Transitions globales ── */
-  --transition:  0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ── Transitions ── */
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Mode clair nocturne — beige ambré chaud ────────────────────────────────── */
 [data-theme="light"] {
-  --bg:          #eef3f8;
-  --bg2:         #e2eaf3;
-  --surface:     #ffffff;
-  --surface2:    #f5f8fc;
-  --border:      #c8d8e8;
-  --border2:     #aec0d2;
-  --text:        #08121e;
-  --text2:       #2e4560;
-  --text3:       #5a7490;
+  --bg:          #1c1612;   /* fond très sombre ambré */
+  --bg2:         #231c15;   /* légèrement plus clair */
+  --surface:     #2c2218;   /* surfaces chaudes */
+  --surface2:    #342820;   /* surfaces secondaires */
+
+  --border:      #3d3025;
+  --border2:     #4e3c2e;
+
+  --accent:      #00d472;   /* vert légèrement adouci sur fond chaud */
+  --accent-dim:  #00b860;
+  --blue:        #5ba3f5;
+  --warn:        #FFB830;
+  --danger:      #FF6B85;
+
+  --text:        #f5e6cc;   /* blanc cassé chaud — crème */
+  --text2:       #c4a882;   /* beige moyen */
+  --text3:       #7a6048;   /* beige foncé */
 }
 
 /* ── Reset ─────────────────────────────────────────────────────────────────── */
@@ -50,9 +58,8 @@
   padding: 0;
 }
 
-/* ── Base ───────────────────────────────────────────────────────────────────── */
 html {
-  font-size: 14px; /* base relevée de 13→14px */
+  font-size: 14px;
   scroll-behavior: smooth;
 }
 
@@ -68,13 +75,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* ── Transitions fluides sur les éléments interactifs ───────────────────────── */
-a,
-button,
-input,
-select,
-textarea,
-[role="button"] {
+/* ── Transitions fluides ────────────────────────────────────────────────────── */
+a, button, input, select, textarea, [role="button"] {
   transition:
     color var(--transition),
     background var(--transition),
@@ -84,7 +86,6 @@ textarea,
     transform var(--transition);
 }
 
-/* ── Inputs globaux ─────────────────────────────────────────────────────────── */
 input, select, textarea {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.9rem;
@@ -100,7 +101,6 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(0, 212, 114, 0.08);
 }
 
-/* ── Boutons globaux ────────────────────────────────────────────────────────── */
 button {
   font-family: 'IBM Plex Mono', monospace;
   cursor: pointer;
@@ -110,7 +110,6 @@ button:active {
   transform: scale(0.97);
 }
 
-/* ── Liens ──────────────────────────────────────────────────────────────────── */
 a {
   color: var(--accent);
   text-decoration: none;
@@ -121,28 +120,18 @@ a:hover {
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text3);
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
-/* ── Sélection de texte ─────────────────────────────────────────────────────── */
+/* ── Sélection ──────────────────────────────────────────────────────────────── */
 ::selection {
   background: rgba(0, 255, 135, 0.2);
   color: var(--text);
 }
 
-/* ── Animations globales ────────────────────────────────────────────────────── */
+/* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes scan {
   0%   { top: -2px; opacity: 0; }
   5%   { opacity: 1; }
@@ -170,11 +159,6 @@ a:hover {
   to   { transform: translateX(0); }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
@@ -195,21 +179,13 @@ a:hover {
 }
 
 /* ── Utilitaires ────────────────────────────────────────────────────────────── */
-
-/* Skeleton loader */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--surface) 25%,
-    var(--surface2) 50%,
-    var(--surface) 75%
-  );
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
 
-/* Card hover générique */
 .card-hover {
   transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
@@ -219,25 +195,8 @@ a:hover {
   transform: translateY(-1px);
 }
 
-/* Texte tronqué */
 .truncate {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Badge accent */
-.badge-accent {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 10px;
-  border-radius: 10px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: rgba(0, 255, 135, 0.08);
-  color: var(--accent);
-  border: 1px solid rgba(0, 255, 135, 0.2);
 }
