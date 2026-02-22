@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
 
 const NAV = [
@@ -36,10 +36,14 @@ export default function Sidebar() {
   const navigate  = useNavigate()
   const location  = useLocation()
   const { profile, logout } = useAuthStore()
+  const [isDark, setIsDark] = useState(true)
 
   useEffect(() => {
-    const saved = localStorage.getItem('theme')
-    if (saved) document.documentElement.setAttribute('data-theme', saved)
+  const saved = localStorage.getItem('theme')
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved)
+    setIsDark(saved !== 'light')
+    }
   }, [])
 
 
@@ -101,29 +105,28 @@ export default function Sidebar() {
       </nav>
 
       {/* Theme Toggle */}
-      <div style={{ padding: '8px 14px', borderTop: '1px solid var(--border)' }}>
-        <button onClick={() => {
-          const isDark = document.documentElement.getAttribute('data-theme') !== 'light'
-          document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark')
-          localStorage.setItem('theme', isDark ? 'light' : 'dark')
-        }} style={{
-          width: '100%', padding: '7px 10px',
-          background: 'none', border: '1px solid var(--border)',
-          borderRadius: 6, cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 8,
-          color: 'var(--text3)', fontSize: 10,
-          fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
-          transition: 'all 0.2s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border2)'}
-        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-        >
-          <span style={{ fontSize: 12 }}>
-            {document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️'}
-          </span>
-          {document.documentElement.getAttribute('data-theme') === 'light' ? 'Mode sombre' : 'Mode clair'}
-        </button>
-      </div>
+    <div style={{ padding: '8px 14px', borderTop: '1px solid #1a2535' }}>
+      <button onClick={() => {
+        const next = !isDark
+        setIsDark(next)
+        document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+        localStorage.setItem('theme', next ? 'dark' : 'light')
+      }} style={{
+        width: '100%', padding: '7px 10px',
+        background: 'none', border: '1px solid #243347',
+        borderRadius: 6, cursor: 'pointer',
+        display: 'flex', alignItems: 'center', gap: 8,
+        color: '#6b849e', fontSize: 10,
+        fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
+        transition: 'all 0.2s',
+      }}
+      onMouseEnter={e => e.currentTarget.style.borderColor = '#3d5268'}
+      onMouseLeave={e => e.currentTarget.style.borderColor = '#243347'}
+      >
+        <span style={{ fontSize: 12 }}>{isDark ? '☀️' : '🌙'}</span>
+        {isDark ? 'Mode clair' : 'Mode sombre'}
+      </button>
+    </div>
       
 
       {/* User */}
