@@ -4,63 +4,62 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════
-   DARK — Espace profond, bleu nuit, accents néon vert
-   Identité : terminal IA, propre, concentré
+   DARK — Fonds relevés pour lisibilité en plein jour
+   Plus de noir pur — du gris-bleu profond avec fort contraste
 ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg:          #04080f;   /* noir bleuté profond */
-  --bg2:         #070d17;
-  --surface:     #0c1521;
-  --surface2:    #111e2d;
+  --bg:          #0b1220;   /* bleu nuit — pas noir pur */
+  --bg2:         #0f1828;
+  --surface:     #152030;
+  --surface2:    #1a2838;
 
-  --border:      #182234;
-  --border2:     #223045;
+  --border:      #253a52;   /* bordures bien visibles */
+  --border2:     #2f4a66;
 
   --accent:      #00FF87;
   --accent-dim:  #00cc6a;
-  --blue:        #4a9eff;
-  --warn:        #ffb93a;
+  --blue:        #5aadff;
+  --warn:        #ffba3a;
   --danger:      #ff4d6d;
 
-  --text:        #e8f1fc;   /* blanc bleuté froid, lisible */
-  --text2:       #7fa8cc;   /* bleu-gris moyen */
-  --text3:       #3d5f7a;   /* discret mais visible */
+  /* Texte — contraste maximum */
+  --text:        #ffffff;   /* blanc pur pour titres/labels */
+  --text2:       #a8c8e8;   /* bleu clair — sous-titres */
+  --text3:       #5a7a96;   /* discret mais encore lisible */
 
   --transition:  0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  --glow-accent: 0 0 12px rgba(0, 255, 135, 0.25);
-  --glow-blue:   0 0 12px rgba(74, 158, 255, 0.2);
+  --glow-accent: 0 0 14px rgba(0, 255, 135, 0.3);
+  --glow-blue:   0 0 14px rgba(90, 173, 255, 0.25);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   LIGHT — Noir chaud ambré, texte crème doré
-   Identité : terminal rétro, bois sombre, encre et or
-   Reposant pour les yeux — zéro blanc agressif
+   LIGHT — Noir chaud ambré, crème doré
+   Reposant, lisible, zéro blanc agressif
 ═══════════════════════════════════════════════════════════════ */
 [data-theme="light"] {
-  --bg:          #100d08;   /* noir à reflet brun chaud */
-  --bg2:         #161109;
-  --surface:     #1e180f;
-  --surface2:    #261f14;
+  --bg:          #12100a;
+  --bg2:         #1a1710;
+  --surface:     #22200f; /* avec une légère teinte chaude */
+  --surface2:    #2a2718;
 
-  --border:      #2e2516;
-  --border2:     #3d3120;
+  --border:      #38331e;
+  --border2:     #4a4428;
 
-  --accent:      #f0a500;   /* or ambré — remplace le vert */
+  --accent:      #f0a500;
   --accent-dim:  #d18e00;
   --blue:        #6ab0f5;
   --warn:        #ff9f30;
   --danger:      #ff5f77;
 
-  --text:        #f0e2c0;   /* crème dorée — douce, chaleureuse */
-  --text2:       #a8895a;   /* caramel moyen */
-  --text3:       #5c4528;   /* brun discret */
+  --text:        #f5e8c0;   /* crème chaude */
+  --text2:       #b89a62;
+  --text3:       #6b5230;
 
-  --glow-accent: 0 0 12px rgba(240, 165, 0, 0.3);
-  --glow-blue:   0 0 12px rgba(106, 176, 245, 0.2);
+  --glow-accent: 0 0 14px rgba(240, 165, 0, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RESET & BASE
+   RESET
 ═══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -68,8 +67,11 @@
   padding: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BASE — Tailles relevées partout
+═══════════════════════════════════════════════════════════════ */
 html {
-  font-size: 14px;
+  font-size: 15px;   /* base relevée : 13 → 15px */
   scroll-behavior: smooth;
 }
 
@@ -77,7 +79,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
-  line-height: 1.65;
+  line-height: 1.7;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -86,7 +88,19 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ÉLÉMENTS INTERACTIFS — transitions fluides globales
+   TYPOGRAPHIE — Tailles cohérentes
+═══════════════════════════════════════════════════════════════ */
+
+/* Labels, badges, metadata */
+.text-xs  { font-size: 0.72rem;  }   /* ~10.8px — était 9px */
+.text-sm  { font-size: 0.82rem;  }   /* ~12.3px — était 10px */
+.text-base{ font-size: 1rem;     }   /* 15px */
+.text-lg  { font-size: 1.15rem;  }   /* ~17px */
+.text-xl  { font-size: 1.33rem;  }   /* ~20px */
+.text-2xl { font-size: 1.6rem;   }   /* ~24px */
+
+/* ═══════════════════════════════════════════════════════════════
+   TRANSITIONS FLUIDES
 ═══════════════════════════════════════════════════════════════ */
 a, button, input, select, textarea, [role="button"] {
   transition:
@@ -103,25 +117,20 @@ button {
   cursor: pointer;
 }
 
-button:active {
-  transform: scale(0.96);
-}
+button:active { transform: scale(0.96); }
 
 a {
   color: var(--accent);
   text-decoration: none;
 }
-
-a:hover {
-  color: var(--accent-dim);
-}
+a:hover { color: var(--accent-dim); }
 
 /* ═══════════════════════════════════════════════════════════════
    INPUTS
 ═══════════════════════════════════════════════════════════════ */
 input, select, textarea {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.875rem;
+  font-size: 0.93rem;
   color: var(--text);
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -131,36 +140,33 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--accent-dim);
-  box-shadow: 0 0 0 3px rgba(0, 204, 106, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 204, 106, 0.12);
 }
 
 [data-theme="light"] input:focus,
 [data-theme="light"] select:focus,
 [data-theme="light"] textarea:focus {
-  box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.14);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    SCROLLBAR
 ═══════════════════════════════════════════════════════════════ */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 4px;
-}
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
 /* ═══════════════════════════════════════════════════════════════
    SÉLECTION
 ═══════════════════════════════════════════════════════════════ */
 ::selection {
-  background: rgba(0, 255, 135, 0.18);
-  color: var(--text);
+  background: rgba(0, 255, 135, 0.2);
+  color: #fff;
 }
-
 [data-theme="light"] ::selection {
-  background: rgba(240, 165, 0, 0.2);
+  background: rgba(240, 165, 0, 0.22);
+  color: var(--text);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -172,44 +178,34 @@ input:focus, select:focus, textarea:focus {
   95%  { opacity: 1; }
   100% { top: 100%; opacity: 0; }
 }
-
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes slideRight {
   from { transform: translateX(-100%); }
   to   { transform: translateX(0); }
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.25; }
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
+@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes shimmer {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
 }
-
 @keyframes glow-pulse {
   0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 135, 0.2); }
-  50%       { box-shadow: 0 0 18px rgba(0, 255, 135, 0.5); }
+  50%       { box-shadow: 0 0 20px rgba(0, 255, 135, 0.55); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -235,7 +231,7 @@ input:focus, select:focus, textarea:focus {
 }
 .card-hover:hover {
   border-color: var(--border2) !important;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
   transform: translateY(-1px);
 }
 
