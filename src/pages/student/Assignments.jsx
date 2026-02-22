@@ -242,9 +242,15 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
       if (tab === 'file') {
         const ext = file.name.split('.').pop()
         const path = `submissions/${assignment.id}/${user.id}/${Date.now()}.${ext}`
-        const { error: uploadErr } = await supabase.storage
+        const uploadPromise = supabase.storage
           .from('assignments')
           .upload(path, file, { upsert: true })
+        
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Upload timeout — connexion trop lente.')), 30000)
+        )
+        
+        const { error: uploadErr } = await Promise.race([uploadPromise, timeoutPromise])
         if (uploadErr) throw uploadErr
         const { data: urlData } = supabase.storage.from('assignments').getPublicUrl(path)
         fileUrl = urlData.publicUrl
@@ -271,7 +277,10 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
   const handleDrop = (e) => {
     e.preventDefault(); setDrag(false)
     const f = e.dataTransfer.files[0]
-    if (f) setFile(f)
+    if (f) {
+          if (f.size > 20 * 1024 * 1024) { setError('Fichier trop lourd. Maximum 20MB.'); return }
+          setFile(f); setError('')
+        }
   }
 
   return (
@@ -365,7 +374,12 @@ function SubmitModal({ assignment, onClose, onSuccess }) {
           >
             <input
               id="file-input" type="file" style={{ display: 'none' }}
-              onChange={e => setFile(e.target.files[0])}
+              onChange={e => {
+              const f = e.target.files[0]
+              if (!f) return
+              if (f.size > 20 * 1024 * 1024) { setError('Fichier trop lourd. Maximum 20MB.'); return }
+              setFile(f); setError('')
+            }}
             />
             <div style={{ width: 28, height: 28, margin: '0 auto 10px', color: file ? '#00c468' : 'var(--text3)' }}>
               {file ? <Icon.Check /> : <Icon.Upload />}
