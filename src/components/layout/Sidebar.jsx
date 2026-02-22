@@ -80,7 +80,7 @@ export default function Sidebar() {
           localStorage.setItem('theme', next ? 'dark' : 'light')
         }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          padding: 4, color: '#3d5268', fontSize: 12,
+          padding: 4, color: '#6b849e', fontSize: 14,
           display: 'flex', alignItems: 'center', flexShrink: 0,
         }}>
           {isDark ? '☀️' : '🌙'}
