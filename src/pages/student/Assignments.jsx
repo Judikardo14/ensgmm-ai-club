@@ -505,7 +505,16 @@ export default function Assignments() {
     setLoading(false)
   }, [user.id])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => {
+  fetchData()
+
+  const ch = supabase.channel('assignments-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions', filter: `user_id=eq.${user.id}` }, () => fetchData())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments' }, () => fetchData())
+    .subscribe()
+
+  return () => supabase.removeChannel(ch)
+}, [fetchData])
 
   // ── Filtrage ──
   const filtered = assignments.filter(a => {
