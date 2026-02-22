@@ -282,7 +282,15 @@ export default function ManageUsers() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchAll() }, [fetchAll])
+  useEffect(() => {
+  fetchAll()
+
+  const ch = supabase.channel('users-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchAll())
+    .subscribe()
+
+  return () => supabase.removeChannel(ch)
+  }, [fetchAll])
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000) }
 
