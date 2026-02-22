@@ -57,7 +57,7 @@ function AssignmentModal({ assignment, onClose, onSaved }) {
       title:       form.title.trim(),
       description: form.description.trim() || null,
       type:        form.type,
-      deadline:    new Date(form.deadline).toISOString(),
+      deadline: form.deadline + ':00',
       max_score:   form.max_score ? parseInt(form.max_score) : null,
     }
 
