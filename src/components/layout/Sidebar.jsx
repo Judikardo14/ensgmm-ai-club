@@ -137,13 +137,13 @@ export default function Sidebar() {
 
 const s = {
   sidebar: {
-    width: 220, minHeight: '100vh', background: '#060a0f',
-    borderRight: '1px solid #1a2535', display: 'flex',
+    width: 220, minHeight: '100vh', background: 'var(--bg2)',
+    borderRight: '1px solid var(--border)', display: 'flex',
     flexDirection: 'column', position: 'fixed',
     top: 0, left: 0, bottom: 0, zIndex: 100,
   },
   brand: {
-    padding: '18px 16px', borderBottom: '1px solid #1a2535',
+    padding: '18px 16px', borderBottom: '1px solid var(--border)',
     display: 'flex', alignItems: 'center', gap: 10,
   },
   brandLogo: {
@@ -153,12 +153,12 @@ const s = {
   },
   brandName: {
     fontFamily: "'Unbounded',sans-serif", fontSize: 9, fontWeight: 700,
-    letterSpacing: '0.2em', color: '#6b849e', textTransform: 'uppercase',
+    letterSpacing: '0.2em', color: 'var(--text2)', textTransform: 'uppercase',
   },
-  brandSub: { fontSize: 7, letterSpacing: '0.15em', color: '#3d5268', textTransform: 'uppercase' },
+  brandSub: { fontSize: 7, letterSpacing: '0.15em', color: 'var(--text3)', textTransform: 'uppercase' },
   nav: { flex: 1, padding: '12px 8px', overflowY: 'auto', minHeight: 0 },
   navLabel: {
-    fontSize: 8, letterSpacing: '0.2em', color: '#3d5268',
+    fontSize: 8, letterSpacing: '0.2em', color: 'var(--text3)',
     textTransform: 'uppercase', padding: '0 8px', marginBottom: 4,
   },
   navItem: {
@@ -173,8 +173,8 @@ const s = {
     color: '#030507', fontWeight: 600,
   },
   user: {
-  padding: '12px 14px', borderTop: '1px solid #1a2535',
-  display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden',
+    padding: '12px 14px', borderTop: '1px solid var(--border)',
+    display: 'flex', alignItems: 'center', gap: 6,
   },
   avatar: {
     width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
@@ -184,12 +184,12 @@ const s = {
     fontFamily: "'Unbounded',sans-serif",
   },
   userName: {
-    fontSize: 11, color: '#dce8f5', letterSpacing: '0.02em',
+    fontSize: 11, color: 'var(--text)', letterSpacing: '0.02em',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
   },
   userRole: { fontSize: 9, color: '#00c468', letterSpacing: '0.1em', textTransform: 'uppercase' },
   logoutBtn: {
     background: 'none', border: 'none', cursor: 'pointer',
-    padding: 4, color: '#3d5268', display: 'flex', alignItems: 'center',
+    padding: 4, color: 'var(--text3)', display: 'flex', alignItems: 'center',
   },
 }
