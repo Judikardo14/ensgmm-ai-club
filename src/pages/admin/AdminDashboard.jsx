@@ -136,8 +136,18 @@ export default function AdminDashboard() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchAll() }, [fetchAll])
+  useEffect(() => {
+  fetchAll()
 
+  const ch = supabase.channel('admin-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, () => fetchAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'assignments' }, () => fetchAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'competitions' }, () => fetchAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchAll())
+    .subscribe()
+
+  return () => supabase.removeChannel(ch)
+}, [fetchAll])
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000) }
 
   return (
