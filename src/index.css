@@ -3,55 +3,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   DARK — Espace profond, bleu nuit, accents néon vert
+   Identité : terminal IA, propre, concentré
+═══════════════════════════════════════════════════════════════ */
 :root {
-  /* ── Fonds dark — légèrement relevés pour casser le noir pur ── */
-  --bg:          #050a10;
-  --bg2:         #080f17;
-  --surface:     #0d1520;
-  --surface2:    #111d2a;
+  --bg:          #04080f;   /* noir bleuté profond */
+  --bg2:         #070d17;
+  --surface:     #0c1521;
+  --surface2:    #111e2d;
 
-  /* ── Bordures — plus visibles ── */
-  --border:      #1e2f42;
-  --border2:     #2a3f56;
+  --border:      #182234;
+  --border2:     #223045;
 
-  /* ── Accents ── */
   --accent:      #00FF87;
-  --accent-dim:  #00d472;
-  --blue:        #3d8ef0;
-  --warn:        #FFB830;
-  --danger:      #FF4B6E;
+  --accent-dim:  #00cc6a;
+  --blue:        #4a9eff;
+  --warn:        #ffb93a;
+  --danger:      #ff4d6d;
 
-  /* ── Texte — contraste amélioré ── */
-  --text:        #f0f7ff;
-  --text2:       #9dbdd8;
-  --text3:       #5e7d96;
+  --text:        #e8f1fc;   /* blanc bleuté froid, lisible */
+  --text2:       #7fa8cc;   /* bleu-gris moyen */
+  --text3:       #3d5f7a;   /* discret mais visible */
 
-  /* ── Transitions ── */
-  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition:  0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --glow-accent: 0 0 12px rgba(0, 255, 135, 0.25);
+  --glow-blue:   0 0 12px rgba(74, 158, 255, 0.2);
 }
 
-/* ── Mode clair — noir & beige ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT — Noir chaud ambré, texte crème doré
+   Identité : terminal rétro, bois sombre, encre et or
+   Reposant pour les yeux — zéro blanc agressif
+═══════════════════════════════════════════════════════════════ */
 [data-theme="light"] {
-  --bg:          #0f0e0b;   /* presque noir, légère teinte chaude */
-  --bg2:         #161410;   /* fond secondaire */
-  --surface:     #1e1b14;   /* surfaces — brun très sombre */
-  --surface2:    #252118;   /* surfaces secondaires */
+  --bg:          #100d08;   /* noir à reflet brun chaud */
+  --bg2:         #161109;
+  --surface:     #1e180f;
+  --surface2:    #261f14;
 
-  --border:      #2e2a1f;   /* bordures discrètes beige sombre */
-  --border2:     #3d3828;   /* bordures actives */
+  --border:      #2e2516;
+  --border2:     #3d3120;
 
-  --accent:      #00d472;
-  --accent-dim:  #00b860;
-  --blue:        #5ba3f5;
-  --warn:        #FFB830;
-  --danger:      #FF6B85;
+  --accent:      #f0a500;   /* or ambré — remplace le vert */
+  --accent-dim:  #d18e00;
+  --blue:        #6ab0f5;
+  --warn:        #ff9f30;
+  --danger:      #ff5f77;
 
-  --text:        #e8dcc8;   /* beige clair principal — lisible et doux */
-  --text2:       #b5a080;   /* beige moyen */
-  --text3:       #6b5c42;   /* beige foncé — textes discrets */
+  --text:        #f0e2c0;   /* crème dorée — douce, chaleureuse */
+  --text2:       #a8895a;   /* caramel moyen */
+  --text3:       #5c4528;   /* brun discret */
+
+  --glow-accent: 0 0 12px rgba(240, 165, 0, 0.3);
+  --glow-blue:   0 0 12px rgba(106, 176, 245, 0.2);
 }
 
-/* ── Reset ─────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -67,15 +77,17 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 1rem;
   line-height: 1.65;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ── Transitions fluides ────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   ÉLÉMENTS INTERACTIFS — transitions fluides globales
+═══════════════════════════════════════════════════════════════ */
 a, button, input, select, textarea, [role="button"] {
   transition:
     color var(--transition),
@@ -86,28 +98,13 @@ a, button, input, select, textarea, [role="button"] {
     transform var(--transition);
 }
 
-input, select, textarea {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  outline: none;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: var(--accent-dim);
-  box-shadow: 0 0 0 3px rgba(0, 212, 114, 0.08);
-}
-
 button {
   font-family: 'IBM Plex Mono', monospace;
   cursor: pointer;
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 a {
@@ -119,19 +116,56 @@ a:hover {
   color: var(--accent-dim);
 }
 
-/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+/* ═══════════════════════════════════════════════════════════════
+   INPUTS
+═══════════════════════════════════════════════════════════════ */
+input, select, textarea {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px rgba(0, 204, 106, 0.1);
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 4px;
+}
 ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
-/* ── Sélection ──────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   SÉLECTION
+═══════════════════════════════════════════════════════════════ */
 ::selection {
-  background: rgba(0, 255, 135, 0.2);
+  background: rgba(0, 255, 135, 0.18);
   color: var(--text);
 }
 
-/* ── Animations ─────────────────────────────────────────────────────────────── */
+[data-theme="light"] ::selection {
+  background: rgba(240, 165, 0, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════════════════ */
 @keyframes scan {
   0%   { top: -2px; opacity: 0; }
   5%   { opacity: 1; }
@@ -140,7 +174,7 @@ a:hover {
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -161,7 +195,7 @@ a:hover {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+  50%       { opacity: 0.25; }
 }
 
 @keyframes spin {
@@ -170,28 +204,38 @@ a:hover {
 
 @keyframes shimmer {
   0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  100% { background-position:  200% center; }
 }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 135, 0.3); }
-  50%       { box-shadow: 0 0 16px rgba(0, 255, 135, 0.6); }
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 135, 0.2); }
+  50%       { box-shadow: 0 0 18px rgba(0, 255, 135, 0.5); }
 }
 
-/* ── Utilitaires ────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   UTILITAIRES
+═══════════════════════════════════════════════════════════════ */
 .skeleton {
-  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--surface)  25%,
+    var(--surface2) 50%,
+    var(--surface)  75%
+  );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.6s infinite;
   border-radius: 6px;
 }
 
 .card-hover {
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 .card-hover:hover {
   border-color: var(--border2) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
   transform: translateY(-1px);
 }
 
