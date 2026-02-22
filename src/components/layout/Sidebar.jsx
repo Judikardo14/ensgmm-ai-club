@@ -104,38 +104,25 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Theme Toggle */}
-    <div style={{ padding: '8px 14px', borderTop: '1px solid #1a2535' }}>
-      <button onClick={() => {
-        const next = !isDark
-        setIsDark(next)
-        document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
-        localStorage.setItem('theme', next ? 'dark' : 'light')
-      }} style={{
-        width: '100%', padding: '7px 10px',
-        background: 'none', border: '1px solid #243347',
-        borderRadius: 6, cursor: 'pointer',
-        display: 'flex', alignItems: 'center', gap: 8,
-        color: '#6b849e', fontSize: 10,
-        fontFamily: "'IBM Plex Mono',monospace", letterSpacing: '0.08em',
-        transition: 'all 0.2s',
-      }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = '#3d5268'}
-      onMouseLeave={e => e.currentTarget.style.borderColor = '#243347'}
-      >
-        <span style={{ fontSize: 12 }}>{isDark ? '☀️' : '🌙'}</span>
-        {isDark ? 'Mode clair' : 'Mode sombre'}
-      </button>
-    </div>
-      
-
-      {/* User */}
+     {/* User */}
       <div style={s.user}>
         <div style={s.avatar}>{initials}</div>
         <div style={{flex:1, overflow:'hidden'}}>
           <div style={s.userName}>{profile?.full_name || 'Utilisateur'}</div>
           <div style={s.userRole}>{profile?.role || 'member'}</div>
         </div>
+        <button onClick={() => {
+          const next = !isDark
+          setIsDark(next)
+          document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+          localStorage.setItem('theme', next ? 'dark' : 'light')
+        }} title={isDark ? 'Mode clair' : 'Mode sombre'} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          padding: 4, color: '#3d5268', display: 'flex', alignItems: 'center',
+          fontSize: 13, transition: 'all 0.2s',
+        }}>
+          {isDark ? '☀️' : '🌙'}
+        </button>
         <button onClick={handleLogout} title="Déconnexion" style={s.logoutBtn}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="1.5">
