@@ -266,7 +266,7 @@ export default function ManageUsers() {
         .user-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
         @media(max-width:600px){ .user-stats{ grid-template-columns:repeat(2,1fr); } }
         .user-row { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; transition:all 0.2s; cursor:pointer; flex-wrap:wrap; }
-        .user-row:hover { border-color:#243347; transform:translateX(2px); }
+        .user-row:hover { border-color:#243347; }
         .users-scroll { scrollbar-width:thin; scrollbar-color:#1a2535 transparent; }
         .users-scroll::-webkit-scrollbar { width:4px; }
         .users-scroll::-webkit-scrollbar-track { background:transparent; }
