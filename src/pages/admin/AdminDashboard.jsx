@@ -123,7 +123,7 @@ export default function AdminDashboard() {
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
       supabase.from('assignments').select('*', { count: 'exact', head: true }),
-      supabase.from('submissions').select('*', { count: 'exact', head: true }),
+      supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'submitted'),
       supabase.from('competitions').select('*', { count: 'exact', head: true }),
       supabase.from('submissions')
         .select('*, profiles(full_name), assignments(title, max_score)')
