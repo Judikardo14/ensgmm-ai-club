@@ -190,14 +190,13 @@ function SubmitModal({ assignment, existingSubmission, onClose, onSuccess }) {
       }
 
       const { error: dbErr } = await supabase.from('submissions').upsert({
-        assignment_id: assignment.id,
-        user_id:       user.id,
-        file_url:      fileUrl,
-        notes:         note.trim() || null,
-        status:        asDraft ? 'draft' : 'submitted',
-        is_draft:      asDraft,
-        status: asDraft ? 'pending' : 'submitted',
-      }, { onConflict: 'assignment_id,user_id' })
+      assignment_id: assignment.id,
+      user_id:       user.id,
+      file_url:      fileUrl,
+      notes:         note.trim() || null,
+      is_draft:      asDraft,
+      status:        asDraft ? 'draft' : 'submitted',
+    }, { onConflict: 'assignment_id,user_id' })
 
       if (dbErr) throw dbErr
       onSuccess(asDraft)
