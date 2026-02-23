@@ -240,3 +240,4 @@ input:focus, select:focus, textarea:focus {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+body { overflow-x: hidden; }
