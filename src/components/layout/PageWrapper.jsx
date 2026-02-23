@@ -340,7 +340,7 @@ export default function PageWrapper() {
   }, [profile?.id])
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
+  <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
       <style>{`
         @keyframes notifSlide {
           from { opacity:0; transform:translateY(-10px) scale(0.97); }
@@ -382,8 +382,8 @@ export default function PageWrapper() {
       )}
 
       {/* Main */}
-       <div className="main-content" style={{ marginLeft: SIDEBAR_W, flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        {/* Topbar */}
+       <div className="main-content" style={{ marginLeft: SIDEBAR_W, flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflowY: 'auto' }}>
+         {/* Topbar */}
         <header style={{ height: TOPBAR_H, background: 'rgba(4,8,15,0.88)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 28px', position: 'sticky', top: 0, zIndex: 50 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button className="topbar-menu-btn" onClick={() => setMobileOpen(true)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 7, width: 34, height: 34, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', transition: `all ${T}` }}
