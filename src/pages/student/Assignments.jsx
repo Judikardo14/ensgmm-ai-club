@@ -79,10 +79,9 @@ function AssignmentCard({ assignment, submission, onOpen }) {
   const [hov, setHov] = useState(false)
   const isDraft   = submission?.is_draft === true
   const isFinal   = submission && !isDraft
-  const isExpired = !submission && urgencyLevel(assignment.deadline) === 'expired'
-
-  const level = isFinal ? 'done' : isDraft ? 'draft' : urgencyLevel(assignment.deadline)
-
+  const deadlineExpired = urgencyLevel(assignment.deadline) === 'expired'
+  const isExpired = (!submission || isDraft) && deadlineExpired
+  const level = isFinal ? 'done' : isDraft && deadlineExpired ? 'expired' : isDraft ? 'draft' : urgencyLevel(assignment.deadline)
   const borderColors = { urgent:'#FF4B6E', soon:'#FFB830', ok:'#00c468', expired:'var(--border)', done:'#00c468', draft:'#FFB830' }
   const canClick = !isFinal && !isExpired
 
@@ -171,6 +170,9 @@ function SubmitModal({ assignment, existingSubmission, onClose, onSuccess }) {
 
   const save = async (asDraft) => {
     setError('')
+    if (urgencyLevel(assignment.deadline) === 'expired') {
+      return setError('Le délai est dépassé. Soumission impossible.')
+    }
     if (tab === 'file' && !file && isNew) return setError('Veuillez sélectionner un fichier.')
     if (tab === 'link' && !link.trim()) return setError('Veuillez entrer un lien.')
     setLoading(true)
