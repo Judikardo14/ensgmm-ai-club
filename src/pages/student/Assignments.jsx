@@ -183,7 +183,10 @@ function SubmitModal({ assignment, existingSubmission, onClose, onSuccess }) {
       if (tab === 'file' && file) {
         const ext = file.name.split('.').pop()
         const path = `submissions/${assignment.id}/${user.id}/${Date.now()}.${ext}`
-        const { error: upErr } = await supabase.storage.from('assignments').upload(path, file, { upsert: true })
+        const { error: upErr } = await supabase.storage.from('assignments').upload(path, file, { 
+          upsert: true,
+          contentType: file.type || 'application/octet-stream',
+        })
         if (upErr) throw upErr
         const { data: urlData } = supabase.storage.from('assignments').getPublicUrl(path)
         fileUrl = urlData.publicUrl
