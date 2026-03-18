@@ -21,38 +21,31 @@ import { supabase } from './supabase'
  * @returns {{ success: boolean, score?: number, detail?: object, error?: string }}
  */
 export async function autoScore({ competition, entryId, userId, fileUrl }) {
-  // Si la compétition n'a pas le scoring auto activé → on skip
   if (!competition.auto_score) {
     return { success: false, error: 'Scoring automatique non activé pour cette compétition.' }
   }
 
-  // Récupérer le token de session
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return { success: false, error: 'Non authentifié.' }
-  console.log('Token complet:', session.access_token)
-  console.log('Expire at:', session.expires_at)
-  console.log('User:', session.user?.email)
+
   try {
-  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/score-submission`
-  console.log('URL appelée:', url)
-  console.log('Session token:', session.access_token?.slice(0, 20) + '...')
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${session.access_token}`,
-      'apikey':        import.meta.env.VITE_SUPABASE_ANON_KEY,
-    },
-    body: JSON.stringify({
-      competition_id: competition.id,
-      entry_id:       entryId,
-      user_id:        userId,
-      file_url:       fileUrl,
-    }),
-  })
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/score-submission`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey':        import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        competition_id: competition.id,
+        entry_id:       entryId,
+        user_id:        userId,
+        file_url:       fileUrl,
+      }),
+    })
     const data = await res.json()
     return data
-
   } catch (err) {
     return { success: false, error: err.message || 'Erreur réseau.' }
   }
@@ -104,7 +97,6 @@ export async function validateCSVContent(file, targetColumn, expectedRows) {
 
         const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
 
-        // Vérifier colonne cible
         if (targetColumn && !headers.includes(targetColumn)) {
           return resolve({
             valid: false,
@@ -112,7 +104,6 @@ export async function validateCSVContent(file, targetColumn, expectedRows) {
           })
         }
 
-        // Vérifier nombre de lignes (sans le header)
         const dataRows = lines.length - 1
         if (expectedRows && dataRows !== expectedRows) {
           return resolve({
@@ -130,6 +121,7 @@ export async function validateCSVContent(file, targetColumn, expectedRows) {
     reader.readAsText(file)
   })
 }
+
 /**
  * Vérifie si un fichier est un CSV valide (extension + taille)
  * @param {File} file
