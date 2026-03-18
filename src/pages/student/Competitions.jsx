@@ -4,22 +4,18 @@ import { useAuthStore } from '../../store/authStore'
 import { formatDeadline, initials } from '../../lib/helpers'
 import { validateCSV, validateCSVContent, autoScore } from '../../lib/scorer'
 
-// ─── Icônes ──────────────────────────────────────────────────────────────────
 const Icon = {
   Star:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
   Clock:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
   Users:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  Send:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
   Upload: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
   Link:   () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
   Check:  () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
   X:      () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-  Trophy: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="8 21 12 21 16 21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M7 4H17L19 7C19 9.76 17.76 12.24 16 14C14.7 15.3 13.4 16 12 16C10.6 16 9.3 15.3 8 14C6.24 12.24 5 9.76 5 7L7 4Z"/><path d="M5 7H3C3 9 4 11 6 12"/><path d="M19 7H21C21 9 20 11 18 12"/></svg>,
   ChevronRight: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
   Cpu: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>,
 }
 
-// ─── Countdown hook ───────────────────────────────────────────────────────────
 function useCountdown(end) {
   const [t, setT] = useState('')
   useEffect(() => {
@@ -38,7 +34,6 @@ function useCountdown(end) {
   return t
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 function getStatus(comp) {
   const now = new Date()
   if (new Date(comp.start_date) > now) return 'upcoming'
@@ -68,12 +63,11 @@ function getBanner(comp) {
   return BANNERS.default
 }
 
-// ─── Badge statut ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
-    active:   { label: '● ACTIVE',    color:'#00FF87', bg:'rgba(0,255,135,0.08)', border:'rgba(0,255,135,0.2)' },
-    upcoming: { label: '◎ À VENIR',   color:'#2C7BE5', bg:'rgba(44,123,229,0.08)', border:'rgba(44,123,229,0.2)' },
-    ended:    { label: '○ TERMINÉE',  color:'#3d5268', bg:'rgba(61,82,104,0.15)', border:'rgba(61,82,104,0.3)' },
+    active:   { label: '● ACTIVE',   color:'#00FF87', bg:'rgba(0,255,135,0.08)', border:'rgba(0,255,135,0.2)' },
+    upcoming: { label: '◎ À VENIR',  color:'#2C7BE5', bg:'rgba(44,123,229,0.08)', border:'rgba(44,123,229,0.2)' },
+    ended:    { label: '○ TERMINÉE', color:'#3d5268', bg:'rgba(61,82,104,0.15)', border:'rgba(61,82,104,0.3)' },
   }
   const s = map[status]
   return (
@@ -83,7 +77,6 @@ function StatusBadge({ status }) {
   )
 }
 
-// ─── Modal détail / soumission ────────────────────────────────────────────────
 function CompModal({ comp, entry, onClose, onAction }) {
   const { user } = useAuthStore()
   const status    = getStatus(comp)
@@ -91,22 +84,22 @@ function CompModal({ comp, entry, onClose, onAction }) {
   const countdown = useCountdown(comp.end_date)
   const progress  = timeProgress(comp.start_date, comp.end_date)
 
-  const [tab, setTab]           = useState('file')
-  const [file, setFile]         = useState(null)
-  const [link, setLink]         = useState('')
-  const [note, setNote]         = useState('')
-  const [loading, setLoading]   = useState(false)
-  const [scoring, setScoring]   = useState(false)
-  const [error, setError]       = useState('')
+  const [tab, setTab]                 = useState('file')
+  const [file, setFile]               = useState(null)
+  const [link, setLink]               = useState('')
+  const [note, setNote]               = useState('')
+  const [loading, setLoading]         = useState(false)
+  const [scoring, setScoring]         = useState(false)
+  const [error, setError]             = useState('')
   const [scoreResult, setScoreResult] = useState(null)
-  const [drag, setDrag]         = useState(false)
+  const [drag, setDrag]               = useState(false)
   const [leaderboard, setLeaderboard] = useState([])
-  const [view, setView]         = useState('info')
+  const [view, setView]               = useState('info')
 
   const fetchLeaderboard = useCallback(async () => {
     const { data } = await supabase
       .from('competition_entries')
-      .select('user_id, score, profiles(full_name, avatar_url)')
+      .select('user_id, score, rank, profiles(full_name, avatar_url)')
       .eq('competition_id', comp.id)
       .not('score', 'is', null)
       .order('score', { ascending: false })
@@ -132,15 +125,17 @@ function CompModal({ comp, entry, onClose, onAction }) {
     setLoading(true); setError(''); setScoreResult(null)
 
     try {
-      // ── Vérifier limite soumissions ──
+      // ── Vérifier limite soumissions depuis la DB ──
       if (comp.max_submissions) {
-        const { count } = await supabase
+        const { data: currentEntry } = await supabase
           .from('competition_entries')
-          .select('*', { count: 'exact', head: true })
+          .select('submission_count')
           .eq('competition_id', comp.id)
           .eq('user_id', user.id)
-          .not('submitted_at', 'is', null)
-        if (count >= comp.max_submissions) {
+          .single()
+
+        const currentCount = currentEntry?.submission_count || 0
+        if (currentCount >= comp.max_submissions) {
           setError(`Limite atteinte : ${comp.max_submissions} soumission${comp.max_submissions > 1 ? 's' : ''} maximum.`)
           setLoading(false)
           return
@@ -153,11 +148,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
         if (!basic.valid) { setError(basic.error); setLoading(false); return }
 
         if (comp.metric_column) {
-          const content = await validateCSVContent(
-            file,
-            comp.metric_column,
-            comp.expected_rows || null
-          )
+          const content = await validateCSVContent(file, comp.metric_column, comp.expected_rows || null)
           if (!content.valid) { setError(content.error); setLoading(false); return }
         }
       }
@@ -207,7 +198,6 @@ function CompModal({ comp, entry, onClose, onAction }) {
             userId:      user.id,
             fileUrl,
           })
-          console.log('SCORE RESULT:', result)
           setScoring(false)
           if (result.success) {
             setScoreResult(result)
@@ -230,15 +220,15 @@ function CompModal({ comp, entry, onClose, onAction }) {
     }
   }
 
-  const isParticipant = !!entry
-  const hasSubmitted  = entry?.submitted_at
+  const isParticipant   = !!entry
+  const hasSubmitted    = entry?.submitted_at
+  const submissionCount = entry?.submission_count || 0
 
   return (
     <div style={{ position:'fixed', inset:0, zIndex:1000, background:'rgba(3,5,7,0.9)', backdropFilter:'blur(10px)', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}
       onClick={evt => evt.target === evt.currentTarget && onClose()}>
       <div style={{ background:'var(--surface)', border:'1px solid var(--border2)', borderRadius:14, width:'100%', maxWidth:520, boxShadow:'0 32px 80px rgba(0,0,0,0.8)', animation:'fadeUp 0.25s ease both', overflow:'hidden' }}>
 
-        {/* Banner */}
         <div style={{ height:80, position:'relative', background:banner.bg, overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(0,255,135,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.06) 1px,transparent 1px)', backgroundSize:'20px 20px' }}/>
           {status === 'active' && <div style={{ position:'absolute', top:12, right:12, zIndex:2, width:8, height:8, borderRadius:'50%', background:'#00FF87', boxShadow:'0 0 10px #00FF87', animation:'pulse 1.5s infinite' }}/>}
@@ -250,7 +240,6 @@ function CompModal({ comp, entry, onClose, onAction }) {
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ padding:'20px 24px 24px' }}>
           <div style={{ marginBottom:16 }}>
             <div style={{ fontSize:14, color:'var(--text)', letterSpacing:'0.02em', marginBottom:6 }}>{comp.title}</div>
@@ -258,8 +247,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
               <StatusBadge status={status} />
               {comp.auto_score && (
                 <span style={{ fontSize:9, color:'#2C7BE5', background:'rgba(44,123,229,0.1)', border:'1px solid rgba(44,123,229,0.2)', borderRadius:10, padding:'2px 8px', letterSpacing:'0.08em', display:'flex', alignItems:'center', gap:4 }}>
-                  <div style={{width:9,height:9}}><Icon.Cpu /></div>
-                  AUTO-SCORE
+                  <div style={{width:9,height:9}}><Icon.Cpu /></div>AUTO-SCORE
                 </span>
               )}
               <span style={{ fontSize:10, color:'var(--text3)', letterSpacing:'0.04em', display:'flex', alignItems:'center', gap:4 }}>
@@ -292,7 +280,6 @@ function CompModal({ comp, entry, onClose, onAction }) {
             </div>
           )}
 
-          {/* Tabs */}
           <div style={{ display:'flex', gap:4, marginBottom:18, background:'var(--bg2)', borderRadius:8, padding:4 }}>
             {[['info','Infos'], ['leaderboard','Classement'], ...(isParticipant && status === 'active' ? [['submit','Soumettre']] : [])].map(([k,label]) => (
               <button key={k} onClick={evt => { evt.stopPropagation(); setView(k) }} style={{ flex:1, padding:'6px 0', background:view===k?'var(--surface)':'none', border:view===k?'1px solid var(--border)':'1px solid transparent', borderRadius:6, cursor:'pointer', fontSize:10, fontFamily:"'IBM Plex Mono',monospace", color:view===k?'var(--text)':'var(--text3)', letterSpacing:'0.06em', transition:'all 0.15s' }}>{label}</button>
@@ -306,10 +293,12 @@ function CompModal({ comp, entry, onClose, onAction }) {
                 {[
                   ['Début',   formatDeadline(comp.start_date)],
                   ['Fin',     formatDeadline(comp.end_date)],
-                  ...(comp.prize   ? [['Prix',     comp.prize]]   : []),
-                  ...(comp.metric  ? [['Métrique', comp.metric]]  : []),
-                  ...(comp.metric_column ? [['Colonne cible', comp.metric_column]] : []),
-                  ...(comp.expected_rows ? [['Lignes attendues', `${comp.expected_rows} lignes`]] : []),
+                  ...(comp.prize        ? [['Prix',            comp.prize]]                                              : []),
+                  ...(comp.metric       ? [['Métrique',        comp.metric]]                                             : []),
+                  ...(comp.metric_column? [['Colonne cible',   comp.metric_column]]                                      : []),
+                  ...(comp.expected_rows? [['Lignes attendues',`${comp.expected_rows} lignes`]]                          : []),
+                  ...(submissionCount > 0 ? [['Soumissions', comp.max_submissions ? `${submissionCount}/${comp.max_submissions}` : `${submissionCount}`]] : []),
+                  ...(entry?.rank != null ? [['Rang',         `#${entry.rank}`]]                                         : []),
                 ].map(([k,v]) => (
                   <div key={k} style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:8, padding:'10px 12px' }}>
                     <div style={{ fontSize:9, color:'var(--text3)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:4 }}>{k}</div>
@@ -324,16 +313,16 @@ function CompModal({ comp, entry, onClose, onAction }) {
                 </button>
               )}
               {isParticipant && status === 'active' && (
-                true
-              ) && (
                 <button onClick={() => setView('submit')} style={{ width:'100%', padding:'11px 0', background:'none', border:'1px solid rgba(0,255,135,0.3)', borderRadius:8, cursor:'pointer', color:'#00FF87', fontSize:11, fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.1em', transition:'all 0.2s' }}>
-                  {comp.max_submissions ? `SOUMETTRE → (${entry?.submission_count||0}/${comp.max_submissions})` : 'SOUMETTRE MON TRAVAIL →'}
+                  {comp.max_submissions ? `SOUMETTRE → (${submissionCount}/${comp.max_submissions})` : 'SOUMETTRE MON TRAVAIL →'}
                 </button>
               )}
               {hasSubmitted && (
                 <div style={{ textAlign:'center', padding:'10px 0', fontSize:10, color:'#00c468', letterSpacing:'0.06em', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
                   <div style={{width:12,height:12}}><Icon.Check /></div>
-                  Soumission enregistrée {entry?.score != null && `· Score : ${(entry.score * 100).toFixed(2)}%`}
+                  Soumission enregistrée
+                  {entry?.score != null && ` · Score : ${(entry.score * 100).toFixed(2)}%`}
+                  {entry?.rank  != null && ` · Rang : #${entry.rank}`}
                 </div>
               )}
               {error && <div style={{ fontSize:10, color:'#FF4B6E', marginTop:10, textAlign:'center' }}>{error}</div>}
@@ -347,7 +336,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
                 <div style={{ textAlign:'center', padding:'20px 0', fontSize:11, color:'var(--text3)', letterSpacing:'0.06em' }}>Aucun score publié pour l'instant.</div>
               ) : leaderboard.map((lb, i) => (
                 <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 12px', borderRadius:8, background:i===0?'rgba(0,255,135,0.04)':lb.user_id===user?.id?'rgba(44,123,229,0.05)':'var(--bg2)', border:i===0?'1px solid rgba(0,255,135,0.15)':lb.user_id===user?.id?'1px solid rgba(44,123,229,0.15)':'1px solid var(--border)' }}>
-                  <span style={{ fontFamily:"'Unbounded',sans-serif", fontSize:11, fontWeight:700, width:20, textAlign:'center', color:i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'var(--text3)' }}>{i+1}</span>
+                  <span style={{ fontFamily:"'Unbounded',sans-serif", fontSize:11, fontWeight:700, width:20, textAlign:'center', color:i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'var(--text3)' }}>{lb.rank || i+1}</span>
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg,#00c468,#2C7BE5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:9, fontWeight:700, color:'#030507', fontFamily:"'Unbounded',sans-serif" }}>
                     {initials(lb.profiles?.full_name || '?')}
                   </div>
@@ -366,7 +355,6 @@ function CompModal({ comp, entry, onClose, onAction }) {
           {/* ─ Soumettre ─ */}
           {view === 'submit' && (
             <div>
-              {/* Info format CSV si auto-score */}
               {comp.auto_score && (
                 <div style={{ display:'flex', alignItems:'flex-start', gap:9, padding:'9px 13px', background:'rgba(44,123,229,0.06)', border:'1px solid rgba(44,123,229,0.2)', borderRadius:9, marginBottom:14 }}>
                   <div style={{width:13,height:13,color:'#2C7BE5',flexShrink:0,marginTop:1}}><Icon.Cpu /></div>
@@ -418,7 +406,6 @@ function CompModal({ comp, entry, onClose, onAction }) {
                 style={{width:'100%',padding:'9px 12px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,color:'var(--text)',fontSize:11,fontFamily:"'IBM Plex Mono',monospace",resize:'none',outline:'none',marginBottom:12}}
                 onFocus={evt=>evt.target.style.borderColor='#243347'} onBlur={evt=>evt.target.style.borderColor='var(--border)'} />
 
-              {/* Résultat scoring */}
               {scoreResult && (
                 <div style={{ background:'rgba(0,255,135,0.06)', border:'1px solid rgba(0,255,135,0.2)', borderRadius:9, padding:'12px 14px', marginBottom:12 }}>
                   <div style={{ fontSize:10, color:'#00FF87', fontWeight:600, marginBottom:4, letterSpacing:'0.06em' }}>✓ Score calculé automatiquement</div>
@@ -427,11 +414,11 @@ function CompModal({ comp, entry, onClose, onAction }) {
                   </div>
                   <div style={{ fontSize:9, color:'var(--text3)', marginTop:4 }}>
                     Métrique : {scoreResult.detail?.metric?.toUpperCase()} · {scoreResult.detail?.n_samples} échantillons
+                    {scoreResult.rank && ` · Rang : #${scoreResult.rank}`}
                   </div>
                 </div>
               )}
 
-              {/* Scoring en cours */}
               {scoring && (
                 <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', background:'rgba(44,123,229,0.06)', border:'1px solid rgba(44,123,229,0.2)', borderRadius:9, marginBottom:12 }}>
                   <div style={{ width:12, height:12, color:'#2C7BE5', animation:'spin 1s linear infinite' }}><Icon.Cpu /></div>
@@ -457,11 +444,10 @@ function CompModal({ comp, entry, onClose, onAction }) {
   )
 }
 
-// ─── Card compétition ─────────────────────────────────────────────────────────
 function CompCard({ comp, entry, onClick }) {
-  const status    = getStatus(comp)
-  const banner    = getBanner(comp)
-  const progress  = status === 'active' ? timeProgress(comp.start_date, comp.end_date) : 0
+  const status   = getStatus(comp)
+  const banner   = getBanner(comp)
+  const progress = status === 'active' ? timeProgress(comp.start_date, comp.end_date) : 0
   const countdown = useCountdown(comp.end_date)
 
   return (
@@ -515,7 +501,6 @@ function CompCard({ comp, entry, onClick }) {
   )
 }
 
-// ─── Page principale ──────────────────────────────────────────────────────────
 const FILTERS = ['Toutes', 'Actives', 'À venir', 'Terminées', 'Mes inscriptions']
 
 export default function Competitions() {
@@ -583,10 +568,10 @@ export default function Competitions() {
   return (
     <div style={{ padding:28, maxWidth:900, margin:'0 auto' }}>
       <style>{`
-        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        @keyframes slideIn{ from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes slideIn { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes spin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
       `}</style>
 
       {toast && (
