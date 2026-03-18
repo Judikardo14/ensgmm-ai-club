@@ -207,6 +207,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
             userId:      user.id,
             fileUrl,
           })
+          console.log('SCORE RESULT:', result)
           setScoring(false)
           if (result.success) {
             setScoreResult(result)
@@ -323,7 +324,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
                 </button>
               )}
               {isParticipant && status === 'active' && (
-                comp.max_submissions ? (entry?.submission_count || 0) < comp.max_submissions : !hasSubmitted
+                true
               ) && (
                 <button onClick={() => setView('submit')} style={{ width:'100%', padding:'11px 0', background:'none', border:'1px solid rgba(0,255,135,0.3)', borderRadius:8, cursor:'pointer', color:'#00FF87', fontSize:11, fontFamily:"'IBM Plex Mono',monospace", letterSpacing:'0.1em', transition:'all 0.2s' }}>
                   {comp.max_submissions ? `SOUMETTRE → (${entry?.submission_count||0}/${comp.max_submissions})` : 'SOUMETTRE MON TRAVAIL →'}
