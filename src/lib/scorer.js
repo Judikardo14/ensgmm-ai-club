@@ -129,3 +129,20 @@ export async function validateCSVContent(file, targetColumn, expectedRows) {
     reader.readAsText(file)
   })
 }
+/**
+ * Vérifie si un fichier est un CSV valide (extension + taille)
+ * @param {File} file
+ * @returns {{ valid: boolean, error?: string }}
+ */
+export function validateCSV(file) {
+  if (!file) return { valid: false, error: 'Aucun fichier sélectionné.' }
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  if (ext !== 'csv') {
+    return { valid: false, error: 'Le scoring automatique nécessite un fichier .csv' }
+  }
+  const MAX_MB = 50
+  if (file.size > MAX_MB * 1024 * 1024) {
+    return { valid: false, error: `Fichier trop lourd (max ${MAX_MB}MB).` }
+  }
+  return { valid: true }
+}
