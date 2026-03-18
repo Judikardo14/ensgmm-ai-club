@@ -453,10 +453,26 @@ export default function Dashboard() {
   }
 
   const fetchCompetitions = async () => {
-    const now = new Date().toISOString()
-    const { data } = await supabase.from('competitions').select('*').lte('start_date', now).gte('end_date', now).limit(10)
-    setCompetitions(data || [])
-  }
+  const now = new Date().toISOString()
+  const { data } = await supabase
+    .from('competitions')
+    .select('*')
+    .lte('start_date', now)
+    .gte('end_date', now)
+    .limit(10)
+
+  if (!data) return setCompetitions([])
+
+  const withCounts = await Promise.all(data.map(async c => {
+    const { count } = await supabase
+      .from('competition_entries')
+      .select('*', { count: 'exact', head: true })
+      .eq('competition_id', c.id)
+    return { ...c, participant_count: count || 0 }
+  }))
+
+  setCompetitions(withCounts)
+}
 
   useEffect(() => {
     const ch = supabase.channel('lb')
