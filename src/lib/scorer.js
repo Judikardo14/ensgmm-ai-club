@@ -31,24 +31,23 @@ export async function autoScore({ competition, entryId, userId, fileUrl }) {
   if (!session) return { success: false, error: 'Non authentifié.' }
 
   try {
-    const res = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/score-submission`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey':        import.meta.env.VITE_SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({
-          competition_id: competition.id,
-          entry_id:       entryId,
-          user_id:        userId,
-          file_url:       fileUrl,
-        }),
-      }
-    )
-
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/score-submission`
+  console.log('URL appelée:', url)
+  console.log('Session token:', session.access_token?.slice(0, 20) + '...')
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': `Bearer ${session.access_token}`,
+      'apikey':        import.meta.env.VITE_SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({
+      competition_id: competition.id,
+      entry_id:       entryId,
+      user_id:        userId,
+      file_url:       fileUrl,
+    }),
+  })
     const data = await res.json()
     return data
 
