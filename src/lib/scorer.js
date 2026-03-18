@@ -29,7 +29,9 @@ export async function autoScore({ competition, entryId, userId, fileUrl }) {
   // Récupérer le token de session
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return { success: false, error: 'Non authentifié.' }
-
+  console.log('Token complet:', session.access_token)
+  console.log('Expire at:', session.expires_at)
+  console.log('User:', session.user?.email)
   try {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/score-submission`
   console.log('URL appelée:', url)
