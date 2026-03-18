@@ -86,22 +86,46 @@ export function formatScore(score, metric, detail) {
 }
 
 /**
- * Vérifie si un fichier est un CSV valide (extension + taille)
+ * Vérifie le contenu du CSV : nombre de lignes + colonne cible présente
  * @param {File} file
- * @returns {{ valid: boolean, error?: string }}
+ * @param {string} targetColumn  - colonne attendue (ex: 'duree_sejour_jours')
+ * @param {number} expectedRows  - nombre de lignes attendu (ex: 30)
+ * @returns {Promise<{ valid: boolean, error?: string, rows?: number }>}
  */
-export function validateCSV(file) {
-  if (!file) return { valid: false, error: 'Aucun fichier sélectionné.' }
+export async function validateCSVContent(file, targetColumn, expectedRows) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const text    = e.target.result
+        const lines   = text.trim().split('\n').filter(l => l.trim())
+        if (lines.length < 2) return resolve({ valid: false, error: 'CSV vide ou sans données.' })
 
-  const ext = file.name.split('.').pop()?.toLowerCase()
-  if (ext !== 'csv') {
-    return { valid: false, error: 'Le scoring automatique nécessite un fichier .csv' }
-  }
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
 
-  const MAX_MB = 50
-  if (file.size > MAX_MB * 1024 * 1024) {
-    return { valid: false, error: `Fichier trop lourd (max ${MAX_MB}MB).` }
-  }
+        // Vérifier colonne cible
+        if (targetColumn && !headers.includes(targetColumn)) {
+          return resolve({
+            valid: false,
+            error: `Colonne "${targetColumn}" manquante. Colonnes trouvées : ${headers.join(', ')}`
+          })
+        }
 
-  return { valid: true }
+        // Vérifier nombre de lignes (sans le header)
+        const dataRows = lines.length - 1
+        if (expectedRows && dataRows !== expectedRows) {
+          return resolve({
+            valid: false,
+            error: `Nombre de lignes incorrect : ${dataRows} trouvées, ${expectedRows} attendues.`
+          })
+        }
+
+        resolve({ valid: true, rows: dataRows })
+      } catch {
+        resolve({ valid: false, error: 'Impossible de lire le fichier CSV.' })
+      }
+    }
+    reader.onerror = () => resolve({ valid: false, error: 'Erreur de lecture du fichier.' })
+    reader.readAsText(file)
+  })
 }
