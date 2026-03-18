@@ -124,20 +124,25 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Créer client Supabase avec le service role (accès complet)
+   //  Par ça
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) throw new Error('Non authentifié.')
+    
+    // Client anon pour vérifier le JWT utilisateur
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    )
+    
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser()
+    if (authErr || !user) throw new Error('Token invalide.')
+    
+    // Client service role pour les opérations DB
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
-
-    // Vérifier l'auth de l'appelant
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) throw new Error('Non authentifié.')
-
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    )
-    if (authErr || !user) throw new Error('Token invalide.')
 
     // Parser le body
     const body: ScoreRequest = await req.json()
