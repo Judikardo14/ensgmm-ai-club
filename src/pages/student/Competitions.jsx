@@ -331,7 +331,29 @@ function CompModal({ comp, entry, onClose, onAction }) {
 
           {/* ─ Leaderboard ─ */}
           {view === 'leaderboard' && (
-            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          <div style={{ position:'relative' }}>
+            {leaderboard.length > 5 && (
+              <div style={{ display:'flex', justifyContent:'flex-end', alignItems:'center', gap:8, marginBottom:8 }}>
+                <span style={{ fontSize:9, color:'var(--text3)', letterSpacing:'0.06em' }}>
+                  5 sur {leaderboard.length} affichés
+                </span>
+                <span style={{
+                  fontSize:9, padding:'3px 10px', borderRadius:10,
+                  background:'rgba(0,255,135,0.08)', border:'1px solid rgba(0,255,135,0.25)',
+                  color:'#00FF87', letterSpacing:'0.1em',
+                  fontFamily:"'IBM Plex Mono',monospace",
+                  animation:'pulse 1.8s ease-in-out infinite',
+                }}>
+                  +{leaderboard.length - 5} de plus ↓
+                </span>
+              </div>
+            )}
+            <div style={{
+              display:'flex', flexDirection:'column', gap:6,
+              maxHeight: leaderboard.length > 5 ? 300 : 'none',
+              overflowY: leaderboard.length > 5 ? 'auto' : 'visible',
+              scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
+            }}>
               {leaderboard.length === 0 ? (
                 <div style={{ textAlign:'center', padding:'20px 0', fontSize:11, color:'var(--text3)', letterSpacing:'0.06em' }}>Aucun score publié pour l'instant.</div>
               ) : leaderboard.map((lb, i) => (
