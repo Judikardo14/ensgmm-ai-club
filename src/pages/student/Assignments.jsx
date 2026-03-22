@@ -486,10 +486,10 @@ export default function Assignments() {
 
      {/* Liste */}
       <div style={{ animation:`fadeUp 0.35s 0.15s ${E} both` }}>
-        {!loading && filtered.length > 5 && (
+        {!loading && filtered.length > 4 && (
           <div style={{ display:'flex', justifyContent:'flex-end', alignItems:'center', gap:8, marginBottom:8 }}>
             <span style={{ fontSize:9, color:'var(--text3)', letterSpacing:'0.06em' }}>
-              5 sur {filtered.length} affichés
+              4 sur {filtered.length} affichés
             </span>
             <span style={{
               fontSize:9, padding:'3px 10px', borderRadius:10,
@@ -498,14 +498,14 @@ export default function Assignments() {
               fontFamily:"'IBM Plex Mono',monospace",
               animation:'pulse 1.8s ease-in-out infinite',
             }}>
-              +{filtered.length - 5} de plus ↓
+              +{filtered.length - 4} de plus ↓
             </span>
           </div>
         )}
         <div style={{
           display:'flex', flexDirection:'column', gap:10,
-          maxHeight: filtered.length > 5 ? 380 : 'none',
-          overflowY: filtered.length > 5 ? 'auto' : 'visible',
+          maxHeight: filtered.length > 4 ? 380 : 'none',
+          overflowY: filtered.length > 4 ? 'auto' : 'visible',
           scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
         }}>
         {loading
