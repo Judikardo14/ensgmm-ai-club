@@ -103,7 +103,7 @@ function CompModal({ comp, entry, onClose, onAction }) {
     .eq('competition_id', comp.id)
     .not('score', 'is', null)
     .order('score', { ascending: false })
-    .limit(10)
+    .limit(50)
   if (data && data.length > 0) setLeaderboard(data)
 }, [comp.id])
 
