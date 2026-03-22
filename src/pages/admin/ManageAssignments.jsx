@@ -348,7 +348,7 @@ export default function ManageAssignments() {
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase.from('assignments').select('*').order('deadline', { ascending: true })
+   const { data } = await supabase.from('assignments').select('*').order('created_at', { ascending: false })
     setAssignments(data || [])
 
     if (data?.length) {
