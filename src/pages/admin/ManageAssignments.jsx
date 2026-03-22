@@ -511,6 +511,7 @@ export default function ManageAssignments() {
               )
             })
         }
+        </div>
       </div>
 
       {modal && <AssignmentModal assignment={modal === 'create' ? null : modal} onClose={() => setModal(null)} onSaved={() => { setModal(null); fetchAll(); showToast(modal === 'create' ? '✓ Devoir créé !' : '✓ Devoir modifié !') }} />}
