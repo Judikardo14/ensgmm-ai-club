@@ -97,15 +97,15 @@ function CompModal({ comp, entry, onClose, onAction }) {
   const [view, setView]               = useState('info')
 
   const fetchLeaderboard = useCallback(async () => {
-    const { data } = await supabase
-      .from('competition_entries')
-      .select('user_id, score, rank, profiles(full_name, avatar_url)')
-      .eq('competition_id', comp.id)
-      .not('score', 'is', null)
-      .order('score', { ascending: false })
-      .limit(10)
-    setLeaderboard(data || [])
-  }, [comp.id])
+  const { data } = await supabase
+    .from('competition_entries')
+    .select('user_id, score, profiles(full_name, avatar_url)')
+    .eq('competition_id', comp.id)
+    .not('score', 'is', null)
+    .order('score', { ascending: false })
+    .limit(10)
+  if (data && data.length > 0) setLeaderboard(data)
+}, [comp.id])
 
   useEffect(() => { fetchLeaderboard() }, [fetchLeaderboard])
 
