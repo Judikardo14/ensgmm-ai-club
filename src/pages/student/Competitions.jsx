@@ -371,7 +371,8 @@ function CompModal({ comp, entry, onClose, onAction }) {
                   </span>
                 </div>
               ))}
-            </div>
+             </div>
+        </div>
           )}
 
           {/* ─ Soumettre ─ */}
