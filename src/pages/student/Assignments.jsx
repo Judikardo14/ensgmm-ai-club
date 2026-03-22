@@ -369,7 +369,7 @@ export default function Assignments() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     const [{ data: asgns }, { data: subs }] = await Promise.all([
-      supabase.from('assignments').select('*').order('deadline', { ascending: true }),
+      supabase.from('assignments').select('*').order('created_at', { ascending: false }),
       supabase.from('submissions').select('*').eq('user_id', user.id),
     ])
     setAssignments(asgns || [])
@@ -424,6 +424,7 @@ export default function Assignments() {
         @keyframes slideIn { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
       `}</style>
 
       {/* Toast */}
@@ -483,8 +484,30 @@ export default function Assignments() {
         ))}
       </div>
 
-      {/* Liste */}
-      <div style={{ display:'flex', flexDirection:'column', gap:10, animation:`fadeUp 0.35s 0.15s ${E} both` }}>
+     {/* Liste */}
+      <div style={{ animation:`fadeUp 0.35s 0.15s ${E} both` }}>
+        {!loading && filtered.length > 5 && (
+          <div style={{ display:'flex', justifyContent:'flex-end', alignItems:'center', gap:8, marginBottom:8 }}>
+            <span style={{ fontSize:9, color:'var(--text3)', letterSpacing:'0.06em' }}>
+              5 sur {filtered.length} affichés
+            </span>
+            <span style={{
+              fontSize:9, padding:'3px 10px', borderRadius:10,
+              background:'rgba(0,255,135,0.08)', border:'1px solid rgba(0,255,135,0.25)',
+              color:'#00FF87', letterSpacing:'0.1em',
+              fontFamily:"'IBM Plex Mono',monospace",
+              animation:'pulse 1.8s ease-in-out infinite',
+            }}>
+              +{filtered.length - 5} de plus ↓
+            </span>
+          </div>
+        )}
+        <div style={{
+          display:'flex', flexDirection:'column', gap:10,
+          maxHeight: filtered.length > 5 ? 380 : 'none',
+          overflowY: filtered.length > 5 ? 'auto' : 'visible',
+          scrollbarWidth:'thin', scrollbarColor:'#1a2535 transparent',
+        }}>
         {loading
           ? Array.from({ length:3 }).map((_, i) => <div key={i} style={{ height:72, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:10, opacity:0.5 - i*0.1 }} />)
           : filtered.length === 0
@@ -493,6 +516,7 @@ export default function Assignments() {
               <AssignmentCard key={a.id} assignment={a} submission={submissions[a.id]} onOpen={setSelected} />
             ))
         }
+      </div>
       </div>
 
       {/* Modal */}
