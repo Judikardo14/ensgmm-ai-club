@@ -322,20 +322,19 @@ function SubmissionsModal({ competition, onClose }) {
 }
 
 // ─── Modal création / édition ─────────────────────────────────────────────────
-function CompModal({ competition, onClose, onSaved }) {
-  const { profile } = useAuthStore()
-  const [form, setForm] = useState(competition ? {
-    title:         competition.title,
-    description:   competition.description || '',
-    category:      competition.category    || '',
-    prize:         competition.prize        || '',
-    start_date:    competition.start_date?.slice(0, 16),
-    end_date:      competition.end_date?.slice(0, 16),
-    metric:        competition.metric        || 'accuracy',
-    metric_column: competition.metric_column || 'label',
-    auto_score:    competition.auto_score    || false,
-    status:        competition.status        || 'upcoming',
-  } : { ...EMPTY_FORM })
+const [form, setForm] = useState(competition ? {
+  title:           competition.title,
+  description:     competition.description || '',
+  category:        competition.category    || '',
+  prize:           competition.prize        || '',
+  start_date:      competition.start_date?.slice(0, 16),
+  end_date:        competition.end_date?.slice(0, 16),
+  metric:          competition.metric        || 'accuracy',
+  metric_column:   competition.metric_column || 'label',
+  auto_score:      competition.auto_score    || false,
+  status:          competition.status        || 'upcoming',
+  max_submissions: competition.max_submissions ?? 10,   // ← ajouté
+} : { ...EMPTY_FORM })
   const [savedId, setSavedId] = useState(competition?.id || null)
   const [saving, setSaving]   = useState(false)
   const [error, setError]     = useState('')
@@ -356,6 +355,7 @@ function CompModal({ competition, onClose, onSaved }) {
       start_date: new Date(form.start_date).toISOString(), end_date: new Date(form.end_date).toISOString(),
       metric: form.metric, metric_column: form.metric_column.trim() || 'label',
       auto_score: form.auto_score && form.metric !== 'custom', status: form.status, created_by: profile?.id,
+      max_submissions: form.max_submissions || 10,   // ← ajouté
     }
     if (competition) {
       const { error: e } = await supabase.from('competitions').update(payload).eq('id', competition.id)
@@ -415,6 +415,16 @@ function CompModal({ competition, onClose, onSaved }) {
                 <Field label="Date de début *"><input type="datetime-local" value={form.start_date} onChange={evt => set('start_date', evt.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }} onFocus={evt => evt.target.style.borderColor='#243347'} onBlur={evt => evt.target.style.borderColor='var(--border)'} /></Field>
                 <Field label="Date de fin *"><input type="datetime-local" value={form.end_date} onChange={evt => set('end_date', evt.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }} onFocus={evt => evt.target.style.borderColor='#243347'} onBlur={evt => evt.target.style.borderColor='var(--border)'} /></Field>
               </div>
+                <Field label="Nb max de soumissions par participant" hint="Nombre de fichiers qu'un participant peut soumettre au total">
+                <input
+                  type="number" min="1" max="1000"
+                  value={form.max_submissions}
+                  onChange={evt => set('max_submissions', parseInt(evt.target.value) || 1)}
+                  style={inputStyle}
+                  onFocus={evt => evt.target.style.borderColor='#243347'}
+                  onBlur={evt => evt.target.style.borderColor='var(--border)'}
+                />
+              </Field>
               <Field label="Statut initial">
                 <select value={form.status} onChange={evt => set('status', evt.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
                   <option value="upcoming">À venir</option>
