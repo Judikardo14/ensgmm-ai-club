@@ -322,7 +322,9 @@ function SubmissionsModal({ competition, onClose }) {
 }
 
 // ─── Modal création / édition ─────────────────────────────────────────────────
-const [form, setForm] = useState(competition ? {
+function CompModal({ competition, onClose, onSaved }) {
+  const { profile } = useAuthStore()
+  const [form, setForm] = useState(competition ? {
   title:           competition.title,
   description:     competition.description || '',
   category:        competition.category    || '',
