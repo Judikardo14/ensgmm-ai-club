@@ -97,11 +97,27 @@ export async function validateCSVContent(file, targetColumn, expectedRows) {
 
         const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
 
-        if (targetColumn && !headers.includes(targetColumn)) {
-          return resolve({
-            valid: false,
-            error: `Colonne "${targetColumn}" manquante. Colonnes trouvées : ${headers.join(', ')}`
-          })
+        // Normaliser targetColumn en tableau (string simple ou array jsonb)
+        let columns = []
+        if (Array.isArray(targetColumn)) {
+          columns = targetColumn.map(String)
+        } else {
+          try {
+            const parsed = JSON.parse(targetColumn)
+            columns = Array.isArray(parsed) ? parsed.map(String) : [String(parsed)]
+          } catch {
+            columns = [targetColumn]
+          }
+        }
+
+        // Vérifier que chaque colonne cible est présente
+        for (const col of columns) {
+          if (!headers.includes(col)) {
+            return resolve({
+              valid: false,
+              error: `Colonne "${col}" manquante. Colonnes trouvées : ${headers.join(', ')}`
+            })
+          }
         }
 
         const dataRows = lines.length - 1
