@@ -16,7 +16,7 @@ export const useJudiCardoStore = create((set, get) => ({
     const { data } = await supabase
       .from('judikardo_conversations')
       .select('messages')
-      .single()
+      .maybeSingle()
     if (data?.messages?.length) {
       set({ messages: data.messages, historyLoaded: true })
     } else {
