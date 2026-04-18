@@ -434,10 +434,12 @@ export default function PageWrapper() {
         </header>
 
         {/* Contenu */}
-       <main style={{ flex: 1, animation: `pageIn 0.28s ${E} both` }}>
+        <main style={{ flex: 1, animation: `pageIn 0.28s ${E} both` }}>
           <Outlet />
         </main>
       </div>
+
+      <JudiCardoWidget />
     </div>
   )
 }
