@@ -13,16 +13,25 @@ export const useJudiCardoStore = create(
 
       toggle: () => set(s => ({ isOpen: !s.isOpen })),
 
-      loadHistory: async () => {
-        if (get().messages.length > 0) return
-        const { data } = await supabase
-          .from('judikardo_conversations')
-          .select('messages')
-          .maybeSingle()
-        if (data?.messages?.length) {
-          set({ messages: data.messages.slice(-20) })
-        }
-      },
+     loadHistory: async () => {
+    // Sur nouveau appareil : localStorage vide → charge depuis DB
+    // Sur même appareil : localStorage a des messages → vérifie quand même la DB
+    //                     au cas où d'autres messages existent
+    const localCount = get().messages.length
+  
+    const { data } = await supabase
+      .from('judikardo_conversations')
+      .select('messages')
+      .maybeSingle()
+  
+    if (data?.messages?.length) {
+      const dbMessages = data.messages.slice(-20)
+      // Prendre le plus long entre local et DB
+      if (dbMessages.length >= localCount) {
+        set({ messages: dbMessages })
+      }
+    }
+  },
 
       sendMessage: async (content) => {
         const userMsg = { role: 'user', content }
