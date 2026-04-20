@@ -203,6 +203,10 @@ function SubmissionsModal({ assignment, onClose }) {
       feedback: g.feedback.trim() || null,
       status:   'graded',
     }).eq('id', sub.id)
+
+    // Recalculer le total_points du profil après chaque annotation
+    await supabase.rpc('recalculate_points', { user_uuid: sub.user_id })
+
     setSaving(null)
     setToast('✓ Note enregistrée !')
     setTimeout(() => setToast(null), 2500)
