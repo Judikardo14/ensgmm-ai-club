@@ -379,7 +379,7 @@ export default function ManageAssignments() {
   }, [fetchAll])
 
   const handleDelete = async (a) => {
-    await supabase.from('submissions').delete().eq('assignment_id', a.id)
+    await supabase.from('submissions').update({ archived: true }).eq('assignment_id', a.id)
     await supabase.from('assignments').delete().eq('id', a.id)
     setDeleting(null); fetchAll(); showToast('✓ Devoir supprimé.')
   }
