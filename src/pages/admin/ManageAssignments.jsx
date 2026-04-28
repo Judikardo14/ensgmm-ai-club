@@ -176,11 +176,12 @@ function SubmissionsModal({ assignment, onClose }) {
 
   useEffect(() => {
     const fetchSubs = async () => {
-      const { data } = await supabase
-        .from('submissions')
-        .select('*, profiles(full_name)')
-        .eq('assignment_id', assignment.id)
-        .order('submitted_at', { ascending: false })
+     const { data } = await supabase
+    .from('submissions')
+    .select('*, profiles(full_name)')
+    .eq('assignment_id', assignment.id)
+    .eq('archived', false)
+    .order('submitted_at', { ascending: false })
 
       const finals  = (data || []).filter(s => !s.is_draft)
       const draftList = (data || []).filter(s => s.is_draft)
@@ -359,9 +360,9 @@ export default function ManageAssignments() {
       const counts = {}
       await Promise.all(data.map(async a => {
         const [{ count: final }, { count: draft }] = await Promise.all([
-          supabase.from('submissions').select('*', { count:'exact', head:true }).eq('assignment_id', a.id).eq('is_draft', false),
-          supabase.from('submissions').select('*', { count:'exact', head:true }).eq('assignment_id', a.id).eq('is_draft', true),
-        ])
+        supabase.from('submissions').select('*', { count:'exact', head:true }).eq('assignment_id', a.id).eq('is_draft', false).eq('archived', false),
+        supabase.from('submissions').select('*', { count:'exact', head:true }).eq('assignment_id', a.id).eq('is_draft', true).eq('archived', false),
+      ])
         counts[a.id] = { final: final || 0, draft: draft || 0 }
       }))
       setSubCounts(counts)
