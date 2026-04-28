@@ -370,7 +370,7 @@ export default function Assignments() {
     setLoading(true)
     const [{ data: asgns }, { data: subs }] = await Promise.all([
       supabase.from('assignments').select('*').order('created_at', { ascending: false }),
-      supabase.from('submissions').select('*').eq('user_id', user.id),
+      supabase.from('submissions').select('*').eq('user_id', user.id).eq('archived', false),
     ])
     setAssignments(asgns || [])
     const map = {}
