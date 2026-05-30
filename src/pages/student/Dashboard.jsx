@@ -426,7 +426,7 @@ export default function Dashboard() {
 
   const fetchAssignments = async () => {
     const [{ data: asgn }, { data: subs }] = await Promise.all([
-      supabase.from('assignments').select('*, profiles(full_name)').eq('status', 'open').order('deadline', { ascending: true }).limit(5),
+      supabase.from('assignments').select('*, profiles(full_name)').eq('status', 'open').order('deadline', { ascending: true }),
       supabase.from('submissions').select('assignment_id, score, status, max_score').eq('user_id', profile.id),
     ])
     setSubmissions(subs || [])
