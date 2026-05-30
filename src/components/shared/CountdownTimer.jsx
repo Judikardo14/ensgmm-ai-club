@@ -98,16 +98,6 @@ export default function CountdownTimer({ deadline, size = 'md' }) {
                 textShadow: glow,
                 fontVariantNumeric: 'tabular-nums',
                 transition: 'color 0.3s',
-                // Effet scanline
-                backgroundImage: `repeating-linear-gradient(
-                  0deg,
-                  transparent,
-                  transparent 2px,
-                  rgba(0,0,0,0.15) 2px,
-                  rgba(0,0,0,0.15) 4px
-                )`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: color,
               }}>
                 {pad(v)}
               </div>
@@ -138,7 +128,7 @@ export default function CountdownTimer({ deadline, size = 'md' }) {
             height: '100%',
             width: (() => {
               const diff = new Date(deadline) - new Date()
-              const total = 7 * 86400000 // référence 7 jours
+              const total = 7 * 86400000
               return `${Math.max(0, Math.min(100, (diff / total) * 100))}%`
             })(),
             background: `linear-gradient(90deg, ${color}, transparent)`,
