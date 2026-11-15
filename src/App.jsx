@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ForgotPassword from './pages/auth/ForgotPassword'
 import ResetPassword  from './pages/auth/ResetPassword'
+import ResultatsAICE  from './pages/public/ResultatsAICE'
 
 // Auth
 import Login    from './pages/auth/Login'
@@ -90,6 +91,9 @@ export default function App() {
         
         {/* Ni public ni privé — accessible toujours */}
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Résultats de sélection AICE : page publique, sans connexion */}
+        <Route path="/aice-resultats" element={<ResultatsAICE />} />
 
         
         {/* ── Privé avec layout ── */}
