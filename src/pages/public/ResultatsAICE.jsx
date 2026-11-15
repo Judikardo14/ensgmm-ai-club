@@ -9,6 +9,14 @@ const STATUTS = {
   "À l'étude":       { couleur: '#5BB4FF', rgb: '91,180,255', icone: 'loupe'   },
   'Non retenu':      { couleur: '#FF6B8A', rgb: '255,107,138', icone: 'croix'  },
 }
+// Détail du barème (à garder identique à BAREME dans selection_aice.py)
+const CRITERES = [
+  { cle: 'pts_motivation',    etiquette: 'Motivation',     max: 35 },
+  { cle: 'pts_valeur',        etiquette: 'Valeur ajoutée', max: 35 },
+  { cle: 'pts_serieux',       etiquette: 'Sérieux',        max: 20 },
+  { cle: 'pts_preoccupation', etiquette: 'Préoccupation',  max: 10 },
+]
+
 const STATUT_PAR_DEFAUT = { couleur: '#9fb4cc', rgb: '159,180,204', icone: 'loupe' }
 
 const CSS = `
@@ -25,7 +33,12 @@ const CSS = `
   50%      { opacity: 1;   transform: scale(1.12); }
 }
 @keyframes aiceTourne { to { transform: rotate(360deg); } }
+@keyframes aiceBarre {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
 
+.aice-barre { transform-origin: left center; animation: aiceBarre 0.9s cubic-bezier(.2,.7,.2,1) 0.25s both; }
 .aice-entree { animation: aiceMonte 0.7s cubic-bezier(.2,.7,.2,1) both; }
 .aice-champ {
   transition: border-color .2s, box-shadow .2s, background .2s;
@@ -49,7 +62,7 @@ const CSS = `
   .aice-carte { padding: 26px 20px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .aice-entree, .aice-orbe, .aice-halo, .aice-spinner { animation: none !important; }
+  .aice-entree, .aice-barre, .aice-orbe, .aice-halo, .aice-spinner { animation: none !important; }
 }
 `
 
@@ -243,7 +256,56 @@ export default function ResultatsAICE() {
 
               <div style={{ ...styles.separateur, background: `linear-gradient(90deg, transparent, rgba(${apparence.rgb},0.45), transparent)` }} />
 
+              {resultat.score !== null && resultat.score !== undefined && (
+                <div style={styles.scoreBloc}>
+                  <div style={styles.scoreLigne}>
+                    <span style={{ ...styles.scoreNombre, color: apparence.couleur, textShadow: `0 0 26px rgba(${apparence.rgb},0.55)` }}>
+                      {resultat.score}
+                    </span>
+                    <span style={styles.scoreSur}>/ 100</span>
+                  </div>
+                  <div style={styles.scoreLegende}>SCORE TOTAL</div>
+
+                  <div style={styles.criteres}>
+                    {CRITERES.map(critere => {
+                      const valeur = resultat[critere.cle] ?? 0
+                      const part = Math.max(0, Math.min(1, valeur / critere.max))
+                      return (
+                        <div key={critere.cle} style={styles.critere}>
+                          <div style={styles.critereTete}>
+                            <span>{critere.etiquette}</span>
+                            <span style={{ color: '#e6f0fb' }}>
+                              {valeur}<span style={{ color: '#6c86a3' }}> / {critere.max}</span>
+                            </span>
+                          </div>
+                          <div style={styles.barreFond}>
+                            <div
+                              className="aice-barre"
+                              style={{
+                                ...styles.barre,
+                                width: `${part * 100}%`,
+                                background: `linear-gradient(90deg, rgba(${apparence.rgb},0.55), ${apparence.couleur})`,
+                                boxShadow: `0 0 12px rgba(${apparence.rgb},0.5)`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div style={{ ...styles.separateur, margin: '22px auto 18px', background: `linear-gradient(90deg, transparent, rgba(${apparence.rgb},0.45), transparent)` }} />
+                </div>
+              )}
+
               <p style={styles.resultatMotif}>{resultat.motif}</p>
+
+              {resultat.appreciation && (
+                <div style={styles.appreciation}>
+                  <div style={styles.appreciationTitre}>APPRÉCIATION · ANALYSE ASSISTÉE PAR IA</div>
+                  <p style={styles.appreciationTexte}>{resultat.appreciation}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -387,6 +449,24 @@ const styles = {
   },
   separateur: { height: 1, margin: '20px auto 18px', width: '70%' },
   resultatMotif: { fontSize: 12.5, color: '#c1d2e5', lineHeight: 1.8, margin: 0 },
+
+  scoreBloc: { margin: '4px 0 0' },
+  scoreLigne: { display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8 },
+  scoreNombre: { fontFamily: "'Unbounded', sans-serif", fontSize: 44, fontWeight: 700, lineHeight: 1 },
+  scoreSur: { fontSize: 14, color: '#6c86a3' },
+  scoreLegende: { fontSize: 9.5, letterSpacing: '0.22em', color: '#7f98b3', margin: '8px 0 20px' },
+  criteres: { display: 'grid', gap: 13, textAlign: 'left' },
+  critere: {},
+  critereTete: { display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9fb4cc', marginBottom: 6 },
+  barreFond: { height: 6, borderRadius: 999, background: 'rgba(130,170,210,0.14)', overflow: 'hidden' },
+  barre: { height: '100%', borderRadius: 999 },
+
+  appreciation: {
+    marginTop: 20, padding: '14px 16px', borderRadius: 10, textAlign: 'left',
+    background: 'rgba(130,170,210,0.07)', border: '1px solid rgba(130,170,210,0.16)',
+  },
+  appreciationTitre: { fontSize: 9, letterSpacing: '0.18em', color: '#7f98b3', marginBottom: 8 },
+  appreciationTexte: { fontSize: 12, color: '#c1d2e5', lineHeight: 1.75, margin: 0 },
 
   pied: { textAlign: 'center', marginTop: 22, fontSize: 11, color: '#6c86a3' },
   lien: { color: '#00FF87', textDecoration: 'none', letterSpacing: '0.04em', transition: 'text-shadow .2s' },
