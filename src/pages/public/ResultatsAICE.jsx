@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../../lib/supabase'
+import { supabasePublic as supabase } from '../../lib/supabasePublic'
 
 // Apparence de chaque statut renvoyé par la base
 const STATUTS = {
