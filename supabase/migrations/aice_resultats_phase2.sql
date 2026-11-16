@@ -1,7 +1,16 @@
 -- ============================================================================
 -- AICE phase 2 : lien WhatsApp pour les retenus, sans appréciation de l'IA
--- À coller dans le SQL Editor APRÈS aice_resultats.sql et aice_resultats_scores.sql.
+-- À coller dans le SQL Editor APRÈS aice_resultats.sql (aice_resultats_scores.sql devient inutile).
 -- ============================================================================
+
+-- 0) Colonnes de score (sans effet si aice_resultats_scores.sql a déjà été exécuté).
+--    Ce fichier suffit donc à lui seul, après aice_resultats.sql.
+alter table public.aice_resultats
+  add column if not exists score             int,
+  add column if not exists pts_motivation    int,
+  add column if not exists pts_valeur        int,
+  add column if not exists pts_serieux       int,
+  add column if not exists pts_preoccupation int;
 
 -- 1) Le lien du groupe vit dans la config (aucune lecture publique) et n'est
 --    renvoyé par la fonction qu'aux candidats dont le statut est 'Retenu'.
