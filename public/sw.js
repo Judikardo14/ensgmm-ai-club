@@ -1,7 +1,8 @@
-
+// Service worker minimal : ne touche plus aux appels API (Supabase, POST, autres domaines).
+// Seules les pages/fichiers du site (GET, même origine) passent par ici, avec repli hors-ligne.
 const CACHE = 'aiclub-v1'
 
-self.addEventListener('install', e => {
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
@@ -15,5 +16,7 @@ self.addEventListener('activate', e => {
 })
 
 self.addEventListener('fetch', e => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)))
+  const req = e.request
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return
+  e.respondWith(fetch(req).catch(() => caches.match(req)))
 })

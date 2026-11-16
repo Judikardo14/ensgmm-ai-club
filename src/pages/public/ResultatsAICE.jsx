@@ -71,23 +71,51 @@ export default function ResultatsAICE() {
   const [quatreChiffres, setQuatreChiffres] = useState('')
   const [chargement, setChargement]         = useState(false)
   const [erreur, setErreur]                 = useState('')
+  const [messageAttente, setMessageAttente] = useState('')
   const [resultat, setResultat]             = useState(null)
+
+  // Appel avec délai maximum : sur une connexion lente, on réessaie automatiquement
+  // (2 fois) au lieu de laisser le candidat recharger la page et gaspiller ses essais.
+  const appelerServeur = async () => {
+    const DELAI_MS = 15000
+    let derniere = { data: null, error: new Error('inconnu') }
+    for (let essai = 1; essai <= 3; essai++) {
+      const controleur = new AbortController()
+      const minuteur = setTimeout(() => controleur.abort(), DELAI_MS)
+      try {
+        const reponse = await supabase
+          .rpc('verifier_resultat_aice', { p_email: courriel, p_whatsapp4: quatreChiffres })
+          .abortSignal(controleur.signal)
+        if (!reponse.error && reponse.data) return reponse
+        derniere = reponse
+      } catch (err) {
+        derniere = { data: null, error: err }
+      } finally {
+        clearTimeout(minuteur)
+      }
+      if (essai < 3) {
+        setMessageAttente('Connexion lente, nouvelle tentative en cours…')
+        await new Promise(r => setTimeout(r, 1200))
+      }
+    }
+    return derniere
+  }
 
   const rechercher = async (e) => {
     e.preventDefault()
+    if (chargement) return            // évite les doubles envois
     setChargement(true)
+    setMessageAttente('')
     setErreur('')
     setResultat(null)
 
-    const { data, error } = await supabase.rpc('verifier_resultat_aice', {
-      p_email: courriel,
-      p_whatsapp4: quatreChiffres,
-    })
+    const { data, error } = await appelerServeur()
 
     setChargement(false)
+    setMessageAttente('')
 
     if (error || !data) {
-      setErreur('Une erreur est survenue. Réessaie dans un instant.')
+      setErreur('Connexion trop lente ou instable. Vérifie ton réseau puis appuie à nouveau sur le bouton (inutile de recharger la page).')
       return
     }
     if (data.etat === 'ferme') {
@@ -215,6 +243,9 @@ export default function ResultatsAICE() {
                 </span>
               )}
             </button>
+            {chargement && messageAttente && (
+              <div style={{ marginTop: 12, fontSize: 12, color: '#6b849e', textAlign: 'center' }}>{messageAttente}</div>
+            )}
           </form>
 
           {/* Résultat */}
