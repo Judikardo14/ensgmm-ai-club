@@ -103,6 +103,11 @@ export default function ResultatsAICE() {
     }
   }
 
+  // On n'affiche le lien que s'il s'agit bien d'une invitation WhatsApp
+  const lienWhatsapp = resultat && typeof resultat.lien_whatsapp === 'string'
+    && resultat.lien_whatsapp.startsWith('https://chat.whatsapp.com/')
+    ? resultat.lien_whatsapp : null
+
   const apparence = resultat ? (STATUTS[resultat.statut] || STATUT_PAR_DEFAUT) : null
 
   return (
@@ -300,10 +305,23 @@ export default function ResultatsAICE() {
 
               <p style={styles.resultatMotif}>{resultat.motif}</p>
 
-              {resultat.appreciation && (
-                <div style={styles.appreciation}>
-                  <div style={styles.appreciationTitre}>APPRÉCIATION · ANALYSE ASSISTÉE PAR IA</div>
-                  <p style={styles.appreciationTexte}>{resultat.appreciation}</p>
+              {lienWhatsapp && (
+                <div style={styles.groupeBloc}>
+                  <div style={styles.groupeTexte}>
+                    Dernière étape : rejoins le groupe WhatsApp dédié à la phase suivante.
+                  </div>
+                  <a
+                    href={lienWhatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="aice-bouton"
+                    style={styles.boutonWhatsapp}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.93 9.93 0 1 0 12.04 2Zm5.8 14.1c-.25.7-1.45 1.33-2 1.4-.52.07-1.17.1-1.9-.12-.44-.14-1-.33-1.7-.64-3-1.3-4.95-4.33-5.1-4.53-.15-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.6-.37.8-.37h.58c.18 0 .43-.07.67.52.25.6.84 2.07.92 2.22.07.15.12.32.02.52-.1.2-.15.32-.3.5l-.45.52c-.15.15-.3.3-.13.6.17.3.77 1.27 1.65 2.06 1.13 1 2.08 1.32 2.38 1.47.3.15.47.12.65-.07.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.07.12.07.72-.18 1.42Z"/>
+                    </svg>
+                    REJOINDRE LE GROUPE
+                  </a>
                 </div>
               )}
             </div>
@@ -461,12 +479,19 @@ const styles = {
   barreFond: { height: 6, borderRadius: 999, background: 'rgba(130,170,210,0.14)', overflow: 'hidden' },
   barre: { height: '100%', borderRadius: 999 },
 
-  appreciation: {
-    marginTop: 20, padding: '14px 16px', borderRadius: 10, textAlign: 'left',
-    background: 'rgba(130,170,210,0.07)', border: '1px solid rgba(130,170,210,0.16)',
+  groupeBloc: {
+    marginTop: 22, padding: '18px 16px', borderRadius: 12, textAlign: 'center',
+    background: 'rgba(37,211,102,0.07)', border: '1px solid rgba(37,211,102,0.30)',
   },
-  appreciationTitre: { fontSize: 9, letterSpacing: '0.18em', color: '#7f98b3', marginBottom: 8 },
-  appreciationTexte: { fontSize: 12, color: '#c1d2e5', lineHeight: 1.75, margin: 0 },
+  groupeTexte: { fontSize: 12, color: '#c1d2e5', lineHeight: 1.7, marginBottom: 14 },
+  boutonWhatsapp: {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+    width: '100%', boxSizing: 'border-box', padding: '13px 16px', borderRadius: 10,
+    background: 'linear-gradient(135deg, #3be07a 0%, #25D366 55%, #1ebe5a 100%)',
+    color: '#04140a', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace",
+    fontSize: 12, fontWeight: 600, letterSpacing: '0.1em',
+    boxShadow: '0 6px 26px rgba(37,211,102,0.32), 0 0 0 1px rgba(255,255,255,0.10) inset',
+  },
 
   pied: { textAlign: 'center', marginTop: 22, fontSize: 11, color: '#6c86a3' },
   lien: { color: '#00FF87', textDecoration: 'none', letterSpacing: '0.04em', transition: 'text-shadow .2s' },
