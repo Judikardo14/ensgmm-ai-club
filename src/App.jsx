@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ForgotPassword from './pages/auth/ForgotPassword'
 import ResetPassword  from './pages/auth/ResetPassword'
 import ResultatsAICE  from './pages/public/ResultatsAICE'
+import SaisonDecor    from './components/saisons/SaisonDecor'
 
 // Auth
 import Login    from './pages/auth/Login'
@@ -13,17 +14,17 @@ import Register from './pages/auth/Register'
 import PageWrapper from './components/layout/PageWrapper'
 
 // Student pages
-import Dashboard    from './pages/student/Dashboard'
-import Assignments  from './pages/student/Assignments'
-import Competitions from './pages/student/Competitions'
-import Leaderboard  from './pages/student/Leaderboard'
-import Profile      from './pages/student/Profile'
+const Dashboard = lazy(() => import('./pages/student/Dashboard'))
+const Assignments = lazy(() => import('./pages/student/Assignments'))
+const Competitions = lazy(() => import('./pages/student/Competitions'))
+const Leaderboard = lazy(() => import('./pages/student/Leaderboard'))
+const Profile = lazy(() => import('./pages/student/Profile'))
 
 // Admin pages
-import AdminDashboard    from './pages/admin/AdminDashboard'
-import ManageAssignments from './pages/admin/ManageAssignments'
-import ManageCompetitions from './pages/admin/ManageCompetitions'
-import ManageUsers       from './pages/admin/ManageUsers'
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const ManageAssignments = lazy(() => import('./pages/admin/ManageAssignments'))
+const ManageCompetitions = lazy(() => import('./pages/admin/ManageCompetitions'))
+const ManageUsers = lazy(() => import('./pages/admin/ManageUsers'))
 
 // ─── Guard routes ─────────────────────────────────────────────────────────────
 
@@ -80,6 +81,8 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <SaisonDecor />
+      <Suspense fallback={null}>
       <Routes>
 
         <Route path="/banned" element={<BannedPage />} />
@@ -118,6 +121,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
