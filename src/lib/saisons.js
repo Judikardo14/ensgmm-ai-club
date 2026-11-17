@@ -33,7 +33,6 @@ export const SAISONS = [
   {
     id: 'aid',
     nom: 'Aïd',
-    decor: 'croissant', guirlande: false, foret: false, fanions: false,
     message: 'Aïd Moubarak à toute la communauté du Club IA.',
     couches: [
       couche('etoile', 22, [7, 14], [10, 18], { couleurs: ['#f5d37a', '#ffffff', '#ffe9a8'] }),
@@ -44,7 +43,6 @@ export const SAISONS = [
   {
     id: 'ramadan',
     nom: 'Ramadan',
-    decor: 'croissant', guirlande: false, foret: false, fanions: false,
     message: 'Ramadan Moubarak. Bon courage aux membres qui jeûnent.',
     couches: [
       couche('etoile', 20, [6, 13], [11, 20], { couleurs: ['#f5d37a', '#cfe3ff'] }),
@@ -55,7 +53,6 @@ export const SAISONS = [
   {
     id: 'noel',
     nom: 'Noël',
-    decor: null, guirlande: true, foret: true, fanions: false,
     message: 'Joyeux Noël de la part du Club IA de l\'ENSGMM.',
     couches: [
       // plan lointain : petits flocons lents
@@ -72,7 +69,6 @@ export const SAISONS = [
   {
     id: 'nouvel-an',
     nom: 'Nouvel An',
-    decor: null, guirlande: true, foret: false, fanions: false,
     message: 'Bonne année ! Le Club IA vous souhaite une année riche en projets.',
     couches: [
       couche('confetti', 60, [6, 12], [7, 13], { couleurs: ['#f5d37a', '#ffffff', '#5aadff', '#00FF87', '#ff6b8f'] }),
@@ -83,7 +79,6 @@ export const SAISONS = [
   {
     id: 'saint-valentin',
     nom: 'Saint-Valentin',
-    decor: null, guirlande: false, foret: false, fanions: false,
     message: 'Joyeuse Saint-Valentin à toute la communauté.',
     couches: [
       couche('coeur', 28, [12, 30], [9, 16], { sens: 'haut', couleurs: ['#ff6b8f', '#ff9ab5', '#ff4d6d'], opacite: [0.6, 0.95] }),
@@ -94,7 +89,6 @@ export const SAISONS = [
   {
     id: 'femmes',
     nom: 'Journée de la femme',
-    decor: null, guirlande: false, foret: false, fanions: false,
     message: 'Bonne Journée internationale des droits des femmes.',
     couches: [
       couche('petale', 44, [8, 18], [8, 15], { couleurs: ['#c9a2ff', '#e6d1ff', '#f5d37a'], vent: true }),
@@ -105,7 +99,6 @@ export const SAISONS = [
   {
     id: 'fete-nationale',
     nom: 'Fête nationale du Bénin',
-    decor: null, guirlande: false, foret: false, fanions: true,
     message: 'Bonne fête de l\'Indépendance du Bénin !',
     couches: [
       couche('confetti', 64, [6, 13], [7, 13], { couleurs: ['#008751', '#fcd116', '#e8112d'] }),
@@ -116,7 +109,6 @@ export const SAISONS = [
   {
     id: 'octobre-rose',
     nom: 'Octobre Rose',
-    decor: 'ruban', guirlande: false, foret: false, fanions: false,
     message: 'Octobre Rose : ensemble contre le cancer du sein.',
     couches: [
       couche('petale', 46, [8, 18], [8, 15], { couleurs: ['#ff7eb6', '#ffb3d1', '#ff5aa5'], vent: true }),
