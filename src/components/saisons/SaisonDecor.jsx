@@ -20,17 +20,49 @@ function lireSaisonForcee() {
   } catch { return null }
 }
 
-const Sapin = () => (
-  <svg viewBox="0 0 100 140" width="100%" aria-hidden="true">
-    <rect x="43" y="116" width="14" height="20" rx="2" fill="#6b4423" />
-    <polygon points="50,40 90,86 10,86" fill="#14803c" />
-    <polygon points="50,22 84,66 16,66" fill="#1a9a4a" />
-    <polygon points="50,6 76,46 24,46" fill="#22b85a" />
-    <polygon points="50,0 54,9 63,9 56,15 59,24 50,18 41,24 44,15 37,9 46,9" fill="#f5d37a" className="saison-etoile-sapin" />
-    {[[50,30,'#ff4d6d',0],[38,52,'#f5d37a',0.4],[62,56,'#5aadff',0.8],[30,78,'#ff4d6d',1.1],[52,76,'#f5d37a',0.2],[72,80,'#5aadff',0.6],[44,100,'#ff4d6d',0.9],[66,102,'#f5d37a',0.3],[24,100,'#5aadff',1.2],[80,100,'#ff4d6d',0.5]].map(([cx, cy, c, delai], i) => (
-      <circle key={i} cx={cx} cy={cy} r="3.2" fill={c} className="saison-boule" style={{ animationDelay: `${delai}s` }} />
-    ))}
+// Sapin enneigé (forêt du bas de l'écran)
+const Arbre = ({ hauteur, delai, nuance }) => (
+  <svg viewBox="0 0 100 140" className="saison-arbre" style={{ height: hauteur, animationDelay: `${delai}s` }} aria-hidden="true">
+    <rect x="44" y="118" width="12" height="22" rx="2" fill="#5a3a1e" />
+    <polygon points="50,52 94,120 6,120" fill={nuance[2]} />
+    <polygon points="50,28 84,86 16,86" fill={nuance[1]} />
+    <polygon points="50,4 72,52 28,52" fill={nuance[0]} />
+    <path d="M50 4 L72 52 L62 48 L55 54 L50 46 L45 54 L38 48 L28 52 Z" fill="#f4f8ff" opacity="0.82" />
+    <path d="M30 78 L50 28 L70 78 L62 74 L55 82 L50 74 L45 82 L38 74 Z" fill="#f4f8ff" opacity="0.74" />
+    <path d="M14 112 L50 52 L86 112 L74 108 L64 118 L50 106 L36 118 L26 108 Z" fill="#f4f8ff" opacity="0.7" />
   </svg>
+)
+
+const NUANCES = [['#1c9a4c', '#168a46', '#0f7a3c'], ['#17803f', '#117038', '#0c602f'], ['#23a857', '#1c9a4c', '#168a46']]
+
+function Foret({ petitEcran }) {
+  const arbres = useMemo(() => {
+    const n = petitEcran ? 7 : 16
+    return Array.from({ length: n }, (_, i) => ({
+      gauche: (i / (n - 1)) * 100 + (alea(i, 21) - 0.5) * 4,
+      hauteur: (petitEcran ? 46 : 70) + alea(i, 22) * (petitEcran ? 34 : 64),
+      delai: -alea(i, 23) * 6,
+      nuance: NUANCES[i % 3],
+    }))
+  }, [petitEcran])
+  return (
+    <div className="saison-foret" aria-hidden="true">
+      {arbres.map((a, i) => (
+        <div key={i} className="saison-foret-arbre" style={{ left: `${a.gauche}%` }}>
+          <Arbre hauteur={a.hauteur} delai={a.delai} nuance={a.nuance} />
+        </div>
+      ))}
+      <div className="saison-sol" />
+    </div>
+  )
+}
+
+const Fanions = ({ petitEcran }) => (
+  <div className="saison-fanions" aria-hidden="true">
+    {Array.from({ length: petitEcran ? 14 : 40 }, (_, i) => (
+      <span key={i} style={{ '--c': ['#008751', '#fcd116', '#e8112d'][i % 3], animationDelay: `${(i % 7) * 0.25}s` }} />
+    ))}
+  </div>
 )
 
 const Ruban = () => (
@@ -54,7 +86,7 @@ const Croissant = () => (
   </svg>
 )
 
-const DECORS = { sapin: Sapin, ruban: Ruban, croissant: Croissant }
+const DECORS = { ruban: Ruban, croissant: Croissant }
 
 export default function SaisonDecor() {
   const saison = useMemo(() => saisonActive(new Date(), lireSaisonForcee()), [])
@@ -81,18 +113,24 @@ export default function SaisonDecor() {
     return () => { clearTimeout(debut); clearTimeout(fin) }
   }, [saison, actif])
 
-  const particules = useMemo(() => {
+  const couches = useMemo(() => {
     if (!saison) return []
-    const n = petitEcran ? Math.ceil(saison.nombre * 0.5) : saison.nombre
-    return Array.from({ length: n }, (_, i) => ({
-      gauche: alea(i, 1) * 100,
-      taille: 6 + alea(i, 2) * 10,
-      duree: 9 + alea(i, 3) * 11,
-      delai: -alea(i, 4) * 20,
-      derive: (alea(i, 5) - 0.5) * 80,
-      couleur: saison.couleurs[i % saison.couleurs.length],
-      opacite: 0.55 + alea(i, 6) * 0.4,
-    }))
+    return saison.couches.map((c, k) => {
+      const n = petitEcran ? Math.ceil(c.nombre * 0.5) : c.nombre
+      const entre = (i, g, [min, max]) => min + alea(i, g + k * 13) * (max - min)
+      return {
+        ...c,
+        particules: Array.from({ length: n }, (_, i) => ({
+          gauche: alea(i, 1 + k * 13) * 100,
+          taille: entre(i, 2, c.taille),
+          duree: entre(i, 3, c.duree),
+          delai: -alea(i, 4 + k * 13) * c.duree[1],
+          derive: (alea(i, 5 + k * 13) - 0.5) * 140,
+          couleur: c.couleurs[i % c.couleurs.length],
+          opacite: entre(i, 6, c.opacite),
+        })),
+      }
+    })
   }, [saison, petitEcran])
 
   if (!saison) return null
@@ -100,9 +138,14 @@ export default function SaisonDecor() {
 
   return (
     <>
-      {actif && !reduit && (
-        <div className={`saison-couche saison-${saison.forme}`} aria-hidden="true">
-          {particules.map((p, i) => (
+      {actif && !reduit && couches.map((c, k) => (
+        <div
+          key={k}
+          className={`saison-couche saison-f-${c.forme}${c.vent ? ' saison-vent' : ''}${c.sens === 'haut' ? ' saison-haut' : ''}`}
+          style={c.flou ? { filter: `blur(${c.flou}px)` } : undefined}
+          aria-hidden="true"
+        >
+          {c.particules.map((p, i) => (
             <span
               key={i}
               className="saison-particule"
@@ -114,7 +157,10 @@ export default function SaisonDecor() {
             />
           ))}
         </div>
-      )}
+      ))}
+
+      {actif && saison.foret && <Foret petitEcran={petitEcran} />}
+      {actif && saison.fanions && <Fanions petitEcran={petitEcran} />}
 
       {actif && saison.guirlande && (
         <div className="saison-guirlande" aria-hidden="true">
