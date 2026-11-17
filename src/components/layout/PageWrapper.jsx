@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { supabase } from '../../lib/supabase'
@@ -436,7 +436,9 @@ export default function PageWrapper() {
 
         {/* Contenu */}
         <main style={{ flex: 1, animation: `pageIn 0.28s ${E} both` }}>
-          <Outlet />
+          <Suspense fallback={<div style={{ padding: 40, color: 'var(--text3)', fontSize: 11, letterSpacing: '0.15em' }}>CHARGEMENT…</div>}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 
